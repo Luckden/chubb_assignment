@@ -1,26 +1,20 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Claims.Api.Tests.Infrastructure;
 
 namespace Claims.Api.Tests;
 
-public class SmokeTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+[Collection(ApiCollection.Name)]
+public class SmokeTests(ClaimsApiFactory factory)
 {
-    [Fact]
-    public async Task Liveness_endpoint_returns_ok()
+    [Theory]
+    [InlineData("/health/live")]
+    [InlineData("/health/ready")] // includes the PostgreSQL check
+    [InlineData("/api/system/info")]
+    public async Task Endpoint_returns_ok(string url)
     {
         var client = factory.CreateClient();
 
-        var response = await client.GetAsync("/health/live");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task System_info_endpoint_returns_ok()
-    {
-        var client = factory.CreateClient();
-
-        var response = await client.GetAsync("/api/system/info");
+        var response = await client.GetAsync(url);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

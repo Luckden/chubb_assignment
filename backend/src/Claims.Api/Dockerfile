@@ -1,7 +1,7 @@
 # Build context: ./backend
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY global.json ClaimsPlatform.slnx ./
+COPY global.json ClaimsPlatform.slnx Directory.Build.props ./
 COPY src/Claims.Api/Claims.Api.csproj src/Claims.Api/
 RUN dotnet restore src/Claims.Api/Claims.Api.csproj
 COPY src/ src/

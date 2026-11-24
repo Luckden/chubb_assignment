@@ -1,5 +1,6 @@
 using Claims.Api.Infrastructure.Messaging;
 using Claims.Api.Infrastructure.Persistence;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,11 @@ var connectionString = builder.Configuration.GetConnectionString("ClaimsDb")
 
 // --- Persistence -----------------------------------------------------------
 builder.Services.AddDbContext<ClaimsDbContext>(options => options.UseNpgsql(connectionString));
+// Seeders: register implementations of IDataSeeder here, e.g. builder.Services.AddScoped<IDataSeeder, DemoDataSeeder>();
+
+// --- Application -----------------------------------------------------------
+// Validators (AbstractValidator<T>) are discovered from this assembly. Call them from application services.
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 
 // --- Messaging (Kafka) -----------------------------------------------------
 builder.Services.AddKafkaMessaging(builder.Configuration);
@@ -45,9 +51,10 @@ app.MapControllers();
 app.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
 app.MapHealthChecks("/health/ready", new HealthCheckOptions { Predicate = c => c.Tags.Contains("ready") });
 
-// TODO: apply EF Core migrations on startup (dev only) once the first migration exists.
+// Applies migrations and runs seeders when Database:MigrateOnStartup is true (Development / tests).
+await app.InitializeDatabaseAsync();
 
-app.Run();
+await app.RunAsync();
 
 // Exposed for WebApplicationFactory in integration tests.
 public partial class Program;
