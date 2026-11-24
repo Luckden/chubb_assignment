@@ -1,26 +1,29 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { LucideAngularModule, ShieldCheck } from 'lucide-angular';
 
-import { SystemApiService } from './core/api/system-api.service';
+import { injectSystemInfoQuery } from './core/api/system.queries';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LucideAngularModule],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  private readonly systemApi = inject(SystemApiService);
+  protected readonly logoIcon = ShieldCheck;
 
-  /** Backend connectivity status shown in the shell. TODO: remove once real features exist. */
-  protected readonly apiStatus = toSignal(
-    this.systemApi.getInfo().pipe(
-      map((info) => `connected (${info.environment})`),
-      catchError(() => of('unreachable')),
-    ),
-    { initialValue: 'checking…' },
-  );
+  /** Backend connectivity shown in the shell. TODO: remove once real features exist. */
+  protected readonly systemInfo = injectSystemInfoQuery();
+
+  protected readonly apiStatus = computed(() => {
+    if (this.systemInfo.isPending()) return 'checking…';
+    if (this.systemInfo.isError()) return 'unreachable';
+    return `connected (${this.systemInfo.data()?.environment})`;
+  });
+
+  protected readonly apiBadgeClass = computed(() => {
+    if (this.systemInfo.isPending()) return 'badge-ghost';
+    return this.systemInfo.isError() ? 'badge-error' : 'badge-success';
+  });
 }

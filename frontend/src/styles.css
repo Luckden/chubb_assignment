@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+
+/* Themes: light by default, dark when the OS prefers it. See .claude/skills/daisyui/SKILL.md for components. */
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark;
+}

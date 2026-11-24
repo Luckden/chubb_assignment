@@ -1,9 +1,16 @@
-<header class="shell-header">
-  <h1>Claims Platform</h1>
-  <p class="api-status" role="status">API: {{ apiStatus() }}</p>
+<header class="navbar bg-base-100 shadow-sm px-4">
+  <div class="flex flex-1 items-center gap-2">
+    <lucide-icon [img]="logoIcon" class="size-6 text-primary" aria-hidden="true" />
+    <h1 class="text-lg font-semibold">Claims Platform</h1>
+  </div>
+  <div class="flex-none">
+    <span class="badge badge-soft" [class]="apiBadgeClass()" role="status"
+      >API: {{ apiStatus() }}</span
+    >
+  </div>
 </header>
 
-<main>
+<main class="container mx-auto p-4 md:p-6">
   <!-- TODO: claimant and claims-staff feature routes -->
   <router-outlet />
 </main>
