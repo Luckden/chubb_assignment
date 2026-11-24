@@ -1,0 +1,14 @@
+@Claims.Api_HostAddress = http://localhost:5080
+
+GET {{Claims.Api_HostAddress}}/api/system/info
+Accept: application/json
+
+###
+
+GET {{Claims.Api_HostAddress}}/health/live
+
+###
+
+GET {{Claims.Api_HostAddress}}/health/ready
+
+###
