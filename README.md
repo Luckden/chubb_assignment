@@ -42,7 +42,9 @@ Override ports and credentials by copying [.env.example](.env.example) to `.env`
 ## Test
 
 ```bash
-dotnet test backend
+dotnet test backend              # integration tests; Testcontainers starts Postgres + Kafka (Docker required)
+./scripts/test-backend-in-docker.sh   # same, inside the SDK container (see Troubleshooting)
+cd frontend && npm run lint && npm run format:check
 cd frontend && npm test          # unit (Vitest)
 cd frontend && npm run e2e       # end-to-end (Playwright), API mocked; starts ng serve itself
 ```
@@ -50,6 +52,15 @@ cd frontend && npm run e2e       # end-to-end (Playwright), API mocked; starts n
 The first time, run `npx playwright install chromium` in `frontend/` to download the browser.
 To run the end-to-end tests against the real stack, including specs tagged `@stack`, start `docker compose up -d` and then run
 `E2E_BASE_URL=http://localhost:4200 npm run e2e`. Use `npm run e2e:report` to open the last HTML report.
+
+CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs all of the above on every PR, and also checks that the
+OpenAPI contract and the generated frontend types are up to date.
+
+## API contract
+
+The backend owns the contract. Building the API writes `backend/openapi/claims-api.json`, and
+`cd frontend && npm run api:generate` turns it into TypeScript types in `frontend/src/app/core/api/generated/`.
+Commit both after any API change.
 
 ## Repository layout
 
@@ -69,7 +80,7 @@ See [docs/README.md](docs/README.md) for the RFC → ADR flow. The AI working jo
 ## Troubleshooting (Windows)
 
 - **`dotnet test`: "An Application Control policy has blocked this file"**: Windows Smart App Control / WDAC is
-  blocking the locally built test DLL. Run the tests in a container or on a machine without that policy, or turn
-  Smart App Control off.
+  blocking the locally built test DLL. Use `./scripts/test-backend-in-docker.sh` (Git Bash), which runs the suite in
+  the .NET SDK container.
 - **`npm test`: "Vitest failed to find the runner"**: the shell's working directory has a lowercase drive letter
   (`c:\…`). Open a new terminal at `C:\…` and run it again.

@@ -16,4 +16,5 @@ Statuses: `Draft` → `In Review` → `Accepted` | `Rejected` | `Withdrawn`
 
 | # | Title | Status | Resulting ADRs |
 | --- | --- | --- | --- |
-| — | _none yet_ | | |
+| [0001](0001-domain-model-and-service-boundaries.md) | Domain model and service boundaries | Draft | |
+| [0002](0002-sync-vs-async-communication.md) | Synchronous vs asynchronous communication (REST and Kafka) | Draft | |

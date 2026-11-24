@@ -40,3 +40,25 @@ brief reasoning. Newest entries at the bottom. Not polished on purpose.
   Vitest unit runner doesn't pick them up.
 - **Why:** mocked end-to-end tests are fast and don't depend on the backend. One `@stack` smoke test proves the wiring end to end.
 - **My notes:** _TODO_
+
+### 2026-11-25: Guardrails for AI-assisted coding
+
+- **Asked:** Gap analysis of docs and tech stack against the brief. Then: commit the scaffold and add the first group
+  of gaps. Purpose: set the stack up for better AI-assisted coding later.
+- **Accepted:**
+  - Warnings as errors and analyzers (`Directory.Build.props`).
+  - FluentValidation registration.
+  - Migrations and seeders on startup.
+  - Testcontainers integration tests (Postgres and Kafka round trip).
+  - OpenAPI exported on build and turned into frontend types.
+  - angular-eslint and Prettier.
+  - GitHub Actions CI.
+  - Drafts: scope doc, RFC-0001 and RFC-0002 (questions only), ADR-0003.
+- **Challenged / overrode (by the AI, to review):**
+  - Removed `openapi-fetch` right after adding it: it bypasses Angular `HttpClient`. Kept types-only generation.
+  - The OpenAPI doc had no response schema because the endpoint returned an anonymous object. Changed it to a typed record.
+  - The API Docker build broke because the Dockerfile didn't copy `Directory.Build.props`. Caught by rebuilding the image, then fixed.
+  - `ng new` on Windows wrote CRLF files, so Prettier failed. Added `.gitattributes` with `eol=lf` and reformatted.
+  - The RFCs were left as open questions on purpose. The domain and REST/Kafka decisions are mine to make.
+- **Deferred:** login and roles, real-time push (SignalR), outbox, file uploads, UI component library, observability.
+- **My notes:** _TODO_

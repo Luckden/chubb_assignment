@@ -5,6 +5,7 @@
 | [rfcs/](rfcs/README.md) | **RFCs**: proposals that get discussed *before* building (problem, options, recommendation). |
 | [adr/](adr/README.md) | **ADRs**: short, immutable records of decisions that were made, and why. |
 | [architecture/](architecture/README.md) | Living descriptions of the system as it is now (context, containers, data model, event flows). |
+| [scope-and-prioritisation.md](scope-and-prioritisation.md) | What is in and out of scope, the time budget, assumptions. |
 | [ai-journal.md](ai-journal.md) | Running log of AI-assisted work: what was asked, accepted, challenged and overridden. |
 
 ## Flow: RFC → ADR
