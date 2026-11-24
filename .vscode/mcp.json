@@ -1,6 +1,6 @@
 {
   // MCP servers for VS Code (Copilot agent mode). Claude Code uses /.mcp.json.
-  // https://angular.dev/ai/mcp
+  // https://angular.dev/ai/mcp · https://daisyui.com/docs/mcp/
   "servers": {
     "angular-cli": {
       "command": "npx",
@@ -9,6 +9,10 @@
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "daisyui": {
+      "type": "http",
+      "url": "https://gitmcp.io/saadeghi/daisyui"
     }
   }
 }

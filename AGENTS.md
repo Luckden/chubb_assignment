@@ -43,6 +43,19 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
 - **Messaging:** publish through `IEventPublisher`; topic names live in `Infrastructure/Messaging/Topics.cs`.
   Events are past-tense facts (`ClaimSubmitted`), keyed by aggregate id.
 - **Frontend:** follow `frontend/AGENTS.md` (standalone, signals, OnPush, `inject()`, native control flow).
+  - **Styling:** Tailwind CSS 4 + daisyUI 5, plain CSS (no SCSS; Tailwind 4 doesn't support Sass). Use daisyUI
+    component classes first, then Tailwind utilities, and write custom CSS last. Rules and the component reference are in
+    `.claude/skills/daisyui/SKILL.md`. No `tailwind.config.js`: configure in `src/styles.css`. Use semantic colours
+    (`bg-primary`, `text-base-content`), not raw palette colours, so themes keep working.
+  - **Behaviour:** daisyUI is CSS only. For dialogs, menus, overlays, focus traps and sortable tables, use `@angular/cdk`.
+  - **Server state:** TanStack Query (`@tanstack/angular-query`). Each API area gets a `core/api/<area>.queries.ts`
+    with a key factory and `inject*Query()` / `inject*Mutation()` helpers (see `system.queries.ts`). Call `inject()`
+    *outside* the `injectQuery` callback. After a mutation, invalidate the affected keys. Don't copy server data into
+    signals or services; local UI state goes in signals.
+  - **Icons:** `lucide-angular` (`LucideAngularModule`, `<lucide-icon [img]="Icon" />`), decorative icons with `aria-hidden`.
+  - **Unit tests with queries:** provide `provideTanStackQuery(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }))`.
+    Call `fixture.detectChanges()`, flush `HttpTestingController`, *then* `await fixture.whenStable()`. An in-flight
+    query counts as pending, so awaiting first deadlocks.
 - **Tests:** add or adjust tests with every behaviour change.
   - Backend tests use the shared `ClaimsApiFactory` (`[Collection(ApiCollection.Name)]`), which runs the real API
     against Testcontainers Postgres and Kafka. Don't mock infrastructure.
