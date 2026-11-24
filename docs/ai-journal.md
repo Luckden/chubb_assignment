@@ -62,3 +62,23 @@ brief reasoning. Newest entries at the bottom. Not polished on purpose.
   - The RFCs were left as open questions on purpose. The domain and REST/Kafka decisions are mine to make.
 - **Deferred:** login and roles, real-time push (SignalR), outbox, file uploads, UI component library, observability.
 - **My notes:** _TODO_
+
+### 2026-11-25: Frontend UI libraries and daisyUI skill
+
+- **Asked:** As someone new to Angular, am I missing UI dependencies like daisyUI or TanStack Query? Then shared
+  the daisyUI Claude Code skill page.
+- **Accepted:**
+  - AI mapped React habits to what Angular has built in (router, HttpClient, forms, signals, DI).
+  - Installed: Tailwind 4, daisyUI 5, Angular CDK 21, TanStack Angular Query, lucide-angular.
+  - daisyUI skill and the daisyUI MCP server.
+  - ADR-0004.
+- **Challenged / overrode (by the AI, to review):**
+  - Downloaded `SKILL.md` directly into `.claude/skills/daisyui/` instead of running `npx skills add` (a third-party
+    CLI). Same file, committed with the project.
+  - Skipped the Blueprint MCP (paid licence) and used the free daisyUI GitMCP.
+  - Switched SCSS to CSS, because Tailwind 4 doesn't support Sass.
+  - The first TanStack Query version called `inject()` inside the `injectQuery` callback. A unit test caught it
+    (NG0203). Changed to resolve services before `injectQuery`.
+  - The unit test then deadlocked: `whenStable()` waits for in-flight queries. Changed it to flush first, then wait.
+  - A screenshot showed the header icon stacked above the title (missing `flex`), so that was fixed.
+- **My notes:** _TODO_
