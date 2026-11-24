@@ -22,7 +22,9 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     const http = TestBed.inject(HttpTestingController);
 
-    http.expectOne('/api/system/info').flush({ service: 'claims-api', environment: 'Test', version: '1.0.0' });
+    http
+      .expectOne('/api/system/info')
+      .flush({ service: 'claims-api', environment: 'Test', version: '1.0.0' });
     await fixture.whenStable();
 
     const status = (fixture.nativeElement as HTMLElement).querySelector('.api-status')?.textContent;
