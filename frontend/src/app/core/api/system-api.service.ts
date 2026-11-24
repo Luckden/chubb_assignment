@@ -3,16 +3,11 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-
-export interface SystemInfo {
-  service: string;
-  environment: string;
-  version: string | null;
-}
+import type { SystemInfo } from './api-types';
 
 /**
  * Placeholder API client proving frontend → backend wiring.
- * TODO: replace with domain API clients (ideally generated from the backend OpenAPI document).
+ * Pattern for real clients: HttpClient + types generated from the backend OpenAPI document (see api-types.ts).
  */
 @Injectable({ providedIn: 'root' })
 export class SystemApiService {
