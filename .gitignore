@@ -1,0 +1,27 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vs/
+*.user
+*.suo
+
+# Env
+.env
+
+# .NET
+**/bin/
+**/obj/
+TestResults/
+*.trx
+
+# Node / Angular (frontend/.gitignore has more)
+node_modules/
+dist/
+.angular/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Assessment brief (third-party material, keep out of the repo)
+docs/*.docx
