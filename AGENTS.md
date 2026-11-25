@@ -34,7 +34,8 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
   Warnings are errors (`backend/Directory.Build.props`), so fix them; don't suppress them without a comment explaining why.
 - **Validation:** one FluentValidation `AbstractValidator<T>` per request DTO (auto-registered). Return validation
   failures as `ValidationProblemDetails` (400).
-- **Persistence:** entity configuration in `IEntityTypeConfiguration<T>` classes (picked up automatically). Every schema
+- **Persistence:** table and column names are snake_case (`UseSnakeCaseNamingConvention`, ADR-0019), so write raw SQL
+  unquoted. Entity configuration in `IEntityTypeConfiguration<T>` classes (picked up automatically). Every schema
   change needs a migration. Demo data goes in an idempotent `IDataSeeder` registered in `Program.cs`.
 - **API contract:** the backend owns it. Controllers return typed `ActionResult<T>` / `[ProducesResponseType]` so
   the OpenAPI schema is complete. After API changes, commit the regenerated `backend/openapi/claims-api.json` and

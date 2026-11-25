@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Claims.Api.Application.Claims;
+using Claims.Api.Application.Notifications;
 using Claims.Api.Controllers;
 using Claims.Api.Infrastructure.Messaging;
 using Claims.Api.Infrastructure.Persistence;
@@ -14,7 +15,7 @@ var connectionString = builder.Configuration.GetConnectionString("ClaimsDb")
     ?? throw new InvalidOperationException("Connection string 'ClaimsDb' is not configured.");
 
 // --- Persistence -----------------------------------------------------------
-builder.Services.AddDbContext<ClaimsDbContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<ClaimsDbContext>(options => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 // Seeders run on every startup when Database:MigrateOnStartup is true, so they must be idempotent.
 builder.Services.AddScoped<IDataSeeder, DemoUserSeeder>();
 
@@ -23,6 +24,8 @@ builder.Services.AddScoped<IDataSeeder, DemoUserSeeder>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<ClaimService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<IEventHandler, ClaimantNotificationHandler>();
 
 // --- Messaging (Kafka) -----------------------------------------------------
 builder.Services.AddKafkaMessaging(builder.Configuration);

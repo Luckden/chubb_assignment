@@ -31,3 +31,7 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0013](0013-test-conventions-and-single-test-project.md) | Test conventions and a single test project | Accepted |
 | [0014](0014-workload-views-computed-on-read-from-status-history.md) | Workload views are computed on read from the status history | Proposed |
 | [0015](0015-exposure-is-claimed-amount-on-open-claims.md) | Liability exposure is the claimed amount on open claims | Accepted |
+| [0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md) | REST for commands and queries, Kafka for lifecycle events through a transactional outbox | Proposed |
+| [0017](0017-frontend-learns-of-changes-by-polling.md) | The frontend learns of changes by polling | Proposed |
+| [0018](0018-claimant-notifications-built-by-a-kafka-consumer.md) | Claimant notifications are built by a Kafka consumer | Proposed |
+| [0019](0019-snake-case-database-names.md) | Database tables and columns use snake_case | Proposed |

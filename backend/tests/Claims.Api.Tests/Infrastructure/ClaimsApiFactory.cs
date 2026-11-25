@@ -25,6 +25,7 @@ public sealed class ClaimsApiFactory : WebApplicationFactory<Program>, IAsyncLif
         builder.UseSetting("ConnectionStrings:ClaimsDb", _postgres.GetConnectionString());
         builder.UseSetting("Kafka:BootstrapServers", KafkaBootstrapServers);
         builder.UseSetting("Database:MigrateOnStartup", "true");
+        builder.UseSetting("Kafka:ConsumerEnabled", "true");
     }
 
     public new async Task DisposeAsync()

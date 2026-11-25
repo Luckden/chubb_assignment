@@ -37,6 +37,8 @@ describe('App', () => {
     http
       .expectOne('/api/system/info')
       .flush({ service: 'claims-api', environment: 'Test', version: '1.0.0' });
+    // The default user is a claimant, so the notifications bell polls too.
+    http.expectOne((r) => r.url === '/api/notifications').flush([]);
     await fixture.whenStable();
 
     const status = (fixture.nativeElement as HTMLElement).querySelector('[role="status"]');

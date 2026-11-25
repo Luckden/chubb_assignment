@@ -27,3 +27,6 @@ export type RejectClaimRequest = Schemas['RejectClaimRequest'];
 
 export type ProblemDetails = Schemas['ProblemDetails'];
 export type ValidationProblemDetails = Schemas['ValidationProblemDetails'];
+
+export type Notification = Schemas['NotificationResponse'];
+export type MarkNotificationReadRequest = Schemas['MarkNotificationReadRequest'];

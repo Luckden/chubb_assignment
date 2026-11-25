@@ -151,3 +151,23 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** Which performance figures R8 shows. Whether officers, with no Manager role, see the exposure view.
+
+### 2026-11-25: Implementing RFC-0002 (Kafka events, outbox, notifications, polling)
+
+- **Asked:** Whether RFC-0002 was implemented (it was not), then to implement it.
+- **Accepted:** The RFC as drafted: lifecycle events through a transactional outbox, one in-process consumer building
+  claimant notifications, frontend polling every 10 s. ADR-0016, 0017 and 0018 are written as Proposed.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Accepting ADR-0016 to 0018, and ADR-0002 and ADR-0003 (still Proposed, and this work builds on both).
+  ADR-0013 still needs the `C3_*` constraint-traced naming exception. No test stops the broker to prove REST keeps
+  working. Not committed yet.
+
+### 2026-11-25: snake_case column names
+
+- **Asked:** Whether SQL convention makes tables snake_case. Columns were still PascalCase, so then to continue.
+- **Accepted:** Renaming all columns to snake_case with a naming-convention package and a rename migration (ADR-0019,
+  Proposed).
+- **Challenged:** That the schema followed SQL convention. Only the table names did.
+- **Overrode:** —
+- **Open:** Accepting ADR-0019.

@@ -25,54 +25,67 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Claims.Api.Domain.Claim", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid?>("AssigneeId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("assignee_id");
 
                     b.Property<string>("ClaimNumber")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("claim_number");
 
                     b.Property<Guid>("ClaimantId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("claimant_id");
 
                     b.Property<decimal>("ClaimedAmount")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("claimed_amount");
 
                     b.Property<DateTimeOffset?>("DecidedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("decided_at");
 
                     b.Property<string>("DecisionOutcome")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("decision_outcome");
 
                     b.Property<string>("DecisionReason")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("decision_reason");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("description");
 
                     b.Property<DateOnly>("IncidentDate")
-                        .HasColumnType("date");
+                        .HasColumnType("date")
+                        .HasColumnName("incident_date");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("status");
 
                     b.Property<DateTimeOffset>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("submitted_at");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("type");
 
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
@@ -80,16 +93,21 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_claims");
 
-                    b.HasIndex("AssigneeId");
+                    b.HasIndex("AssigneeId")
+                        .HasDatabaseName("ix_claims_assignee_id");
 
                     b.HasIndex("ClaimNumber")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_claims_claim_number");
 
-                    b.HasIndex("ClaimantId");
+                    b.HasIndex("ClaimantId")
+                        .HasDatabaseName("ix_claims_claimant_id");
 
-                    b.HasIndex("Status", "SubmittedAt");
+                    b.HasIndex("Status", "SubmittedAt")
+                        .HasDatabaseName("ix_claims_status_submitted_at");
 
                     b.ToTable("claims", (string)null);
                 });
@@ -97,35 +115,45 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Claims.Api.Domain.ClaimStatusChange", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("ChangedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("changed_at");
 
                     b.Property<Guid>("ChangedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("changed_by");
 
                     b.Property<Guid>("ClaimId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("claim_id");
 
                     b.Property<string>("FromStatus")
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("from_status");
 
                     b.Property<string>("Note")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("note");
 
                     b.Property<string>("ToStatus")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("to_status");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_claim_status_changes");
 
-                    b.HasIndex("ChangedBy");
+                    b.HasIndex("ChangedBy")
+                        .HasDatabaseName("ix_claim_status_changes_changed_by");
 
-                    b.HasIndex("ClaimId");
+                    b.HasIndex("ClaimId")
+                        .HasDatabaseName("ix_claim_status_changes_claim_id");
 
                     b.ToTable("claim_status_changes", (string)null);
                 });
@@ -133,60 +161,170 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Claims.Api.Domain.InformationRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("ClaimId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("claim_id");
 
                     b.Property<string>("Question")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("question");
 
                     b.Property<DateTimeOffset>("RequestedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_at");
 
                     b.Property<Guid>("RequestedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("requested_by");
 
                     b.Property<DateTimeOffset?>("RespondedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("responded_at");
 
                     b.Property<string>("Response")
                         .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("response");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_information_requests");
 
-                    b.HasIndex("ClaimId");
+                    b.HasIndex("ClaimId")
+                        .HasDatabaseName("ix_information_requests_claim_id");
 
-                    b.HasIndex("RequestedBy");
+                    b.HasIndex("RequestedBy")
+                        .HasDatabaseName("ix_information_requests_requested_by");
 
                     b.ToTable("information_requests", (string)null);
+                });
+
+            modelBuilder.Entity("Claims.Api.Domain.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("ClaimId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("claim_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("event_id");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("message");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("read_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_notifications");
+
+                    b.HasIndex("ClaimId")
+                        .HasDatabaseName("ix_notifications_claim_id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_notifications_event_id");
+
+                    b.HasIndex("UserId", "CreatedAt")
+                        .HasDatabaseName("ix_notifications_user_id_created_at");
+
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("Claims.Api.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("character varying(32)");
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("role");
 
                     b.Property<string>("TeamId")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("team_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Claims.Api.Infrastructure.Messaging.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("event_type");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("key");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Topic")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("topic");
+
+                    b.HasKey("Id")
+                        .HasName("pk_outbox_messages");
+
+                    b.HasIndex("OccurredAt", "Id")
+                        .HasDatabaseName("ix_outbox_messages_occurred_at_id")
+                        .HasFilter("published_at IS NULL");
+
+                    b.ToTable("outbox_messages", (string)null);
                 });
 
             modelBuilder.Entity("Claims.Api.Domain.Claim", b =>
@@ -194,13 +332,15 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
                     b.HasOne("Claims.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("AssigneeId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_claims_users_assignee_id");
 
                     b.HasOne("Claims.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("ClaimantId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_claims_users_claimant_id");
                 });
 
             modelBuilder.Entity("Claims.Api.Domain.ClaimStatusChange", b =>
@@ -209,13 +349,15 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("ChangedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_claim_status_changes_users_changed_by");
 
                     b.HasOne("Claims.Api.Domain.Claim", null)
                         .WithMany("StatusHistory")
                         .HasForeignKey("ClaimId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_claim_status_changes_claims_claim_id");
                 });
 
             modelBuilder.Entity("Claims.Api.Domain.InformationRequest", b =>
@@ -224,13 +366,32 @@ namespace Claims.Api.Infrastructure.Persistence.Migrations
                         .WithMany("InformationRequests")
                         .HasForeignKey("ClaimId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_information_requests_claims_claim_id");
 
                     b.HasOne("Claims.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("RequestedBy")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_information_requests_users_requested_by");
+                });
+
+            modelBuilder.Entity("Claims.Api.Domain.Notification", b =>
+                {
+                    b.HasOne("Claims.Api.Domain.Claim", null)
+                        .WithMany()
+                        .HasForeignKey("ClaimId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_claims_claim_id");
+
+                    b.HasOne("Claims.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_notifications_users_user_id");
                 });
 
             modelBuilder.Entity("Claims.Api.Domain.Claim", b =>

@@ -1,3 +1,5 @@
+using Claims.Api.Domain.Events;
+
 namespace Claims.Api.Domain;
 
 /// <summary>
@@ -8,6 +10,7 @@ public sealed class Claim
 {
     private readonly List<ClaimStatusChange> _statusHistory = [];
     private readonly List<InformationRequest> _informationRequests = [];
+    private readonly List<ClaimDomainEvent> _domainEvents = [];
 
     private Claim()
     {
@@ -47,6 +50,11 @@ public sealed class Claim
 
     public IReadOnlyCollection<InformationRequest> InformationRequests => _informationRequests;
 
+    /// <summary>Events raised since the last save. The DbContext moves them to the outbox and clears them (RFC-0002).</summary>
+    public IReadOnlyCollection<ClaimDomainEvent> DomainEvents => _domainEvents;
+
+    public void ClearDomainEvents() => _domainEvents.Clear();
+
     /// <summary>R1: a claimant reports an incident.</summary>
     public static Claim Submit(
         Guid claimantId,
@@ -68,6 +76,7 @@ public sealed class Claim
             SubmittedAt = now,
         };
         claim.MoveTo(ClaimStatus.Submitted, claimantId, now, note: null);
+        claim.Raise(new ClaimSubmitted(claim.ClaimNumber, claimantId, type, incidentDate, claimedAmount), now);
         return claim;
     }
 
@@ -77,6 +86,7 @@ public sealed class Claim
         EnsureStatus(ClaimStatus.Submitted, "picked up");
         AssigneeId = officerId;
         MoveTo(ClaimStatus.UnderReview, officerId, now, note: null);
+        Raise(new ClaimPickedUp(officerId), now);
     }
 
     /// <summary>R6: the assigned officer asks the claimant for more information.</summary>
@@ -88,6 +98,7 @@ public sealed class Claim
         var request = new InformationRequest(Id, officerId, question, now);
         _informationRequests.Add(request);
         MoveTo(ClaimStatus.InfoRequested, officerId, now, note: null);
+        Raise(new InformationRequested(request.Id, question), now);
         return request;
     }
 
@@ -102,8 +113,10 @@ public sealed class Claim
         EnsureStatus(ClaimStatus.InfoRequested, "answered");
 
         // Requesting information needs UnderReview and moves the claim to InfoRequested, so exactly one request is open.
-        _informationRequests.Single(r => r.IsOpen).Respond(response, now);
+        var request = _informationRequests.Single(r => r.IsOpen);
+        request.Respond(response, now);
         MoveTo(ClaimStatus.UnderReview, claimantId, now, note: null);
+        Raise(new InformationProvided(request.Id), now);
     }
 
     /// <summary>R7: the assigned officer settles the claim.</summary>
@@ -123,7 +136,11 @@ public sealed class Claim
         DecisionReason = reason;
         DecidedAt = now;
         MoveTo(target, officerId, now, note: reason);
+        Raise(outcome == Domain.DecisionOutcome.Settled ? new ClaimSettled(reason) : new ClaimRejected(reason!), now);
     }
+
+    private void Raise(ClaimDomainEvent @event, DateTimeOffset now) =>
+        _domainEvents.Add(@event with { ClaimId = Id, OccurredAt = now });
 
     private void EnsureStatus(ClaimStatus required, string action)
     {

@@ -8,6 +8,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 
 import { injectSystemInfoQuery } from './core/api/system.queries';
 import { CurrentUser, DEMO_USERS, ROLE_HOME } from './core/session/current-user';
+import { NotificationsMenu } from './shared/notifications/notifications-menu';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ import { CurrentUser, DEMO_USERS, ROLE_HOME } from './core/session/current-user'
     MatButtonModule,
     MatFormFieldModule,
     MatSelectModule,
+    NotificationsMenu,
   ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

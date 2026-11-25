@@ -13,6 +13,7 @@ import type {
   SubmitClaimRequest,
 } from './api-types';
 import { ClaimsApiService } from './claims-api.service';
+import { POLL_INTERVAL_MS } from './polling';
 
 /** Query keys for claims. Every mutation invalidates `lists()` and replaces the claim's `detail()`. */
 export const claimKeys = {
@@ -29,6 +30,8 @@ export function injectClaimListQuery(filter: () => ClaimListFilter) {
     return {
       queryKey: claimKeys.list(current),
       queryFn: () => lastValueFrom(api.list(current)),
+      refetchInterval: POLL_INTERVAL_MS,
+      refetchIntervalInBackground: false,
     };
   });
 }
@@ -40,6 +43,8 @@ export function injectClaimQuery(id: () => string) {
     return {
       queryKey: claimKeys.detail(current),
       queryFn: () => lastValueFrom(api.get(current)),
+      refetchInterval: POLL_INTERVAL_MS,
+      refetchIntervalInBackground: false,
     };
   });
 }

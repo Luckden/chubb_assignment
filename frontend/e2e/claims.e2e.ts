@@ -38,6 +38,7 @@ async function mockClaimsApi(page: Page, initial: ReturnType<typeof aClaim> | nu
   await page.route('**/api/system/info', (route) =>
     route.fulfill({ json: { service: 'claims-api', environment: 'E2E', version: '1.0.0' } }),
   );
+  await page.route('**/api/notifications**', (route) => route.fulfill({ json: [] }));
   await page.route('**/api/claims**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());

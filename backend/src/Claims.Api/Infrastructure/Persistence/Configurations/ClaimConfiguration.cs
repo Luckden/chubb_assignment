@@ -36,6 +36,9 @@ public sealed class ClaimConfiguration : IEntityTypeConfiguration<Claim>
         builder.HasMany(c => c.InformationRequests).WithOne().HasForeignKey(r => r.ClaimId).OnDelete(DeleteBehavior.Cascade);
         builder.Navigation(c => c.InformationRequests).UsePropertyAccessMode(PropertyAccessMode.Field);
 
+        // Raised events are copied to the outbox on save; they are not stored on the claim.
+        builder.Ignore(c => c.DomainEvents);
+
         // The officer queue: unassigned and assigned claims by status, oldest first.
         builder.HasIndex(c => new { c.Status, c.SubmittedAt });
         builder.HasIndex(c => c.AssigneeId);

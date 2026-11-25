@@ -30,6 +30,10 @@
     >API: {{ apiStatus() }}</span
   >
 
+  @if (!currentUser.isOfficer()) {
+    <app-notifications-menu />
+  }
+
   <mat-form-field subscriptSizing="dynamic" class="w-56 text-base">
     <mat-label>Acting as</mat-label>
     <mat-select [value]="currentUser.id()" (selectionChange)="actAs($event.value)">

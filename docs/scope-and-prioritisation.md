@@ -47,8 +47,8 @@ These come from the brief's "questions to consider". They are not requirements, 
 | --- | --- | --- | --- |
 | D1 | Core entities and how they relate | [Design doc 3](design/03-erd.md) | Done |
 | D2 | One service or more, and what drives that | [RFC-0001](rfcs/0001-backend-architecture.md) | Done |
-| D3 | What is synchronous and what is event-driven | [RFC-0002](rfcs/0002-sync-vs-async-communication.md) | Drafted |
+| D3 | What is synchronous and what is event-driven | [RFC-0002](rfcs/0002-sync-vs-async-communication.md), ADR-0016 | Built |
 | D4 | Frontend–backend contract and who defines it | OpenAPI exported on build, backend-owned (AGENTS.md) | Done |
-| D5 | How the async nature of claims processing is handled across both tiers | [RFC-0002](rfcs/0002-sync-vs-async-communication.md) | Drafted |
+| D5 | How the async nature of claims processing is handled across both tiers | [RFC-0002](rfcs/0002-sync-vs-async-communication.md), ADR-0017, ADR-0018 | Built |
 | D6 | What an officer needs to see to manage workload | [RFC-0003](rfcs/0003-officer-workload-and-liability-exposure.md), ADR-0014 | Drafted |
 | D7 | What the system needs to know about liability exposure | [RFC-0003](rfcs/0003-officer-workload-and-liability-exposure.md), ADR-0015 | Drafted |
