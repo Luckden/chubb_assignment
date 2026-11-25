@@ -1,12 +1,49 @@
 <mat-toolbar class="gap-2 border-b border-outline-variant">
   <mat-icon aria-hidden="true">verified_user</mat-icon>
-  <h1 class="m-0 flex-1 text-lg font-medium">Claims Platform</h1>
+  <h1 class="m-0 mr-4 text-lg font-medium">Claims Platform</h1>
+
+  <nav aria-label="Main" class="flex flex-1 gap-1">
+    @if (currentUser.isOfficer()) {
+      <a mat-button routerLink="/work" routerLinkActive="active-link" ariaCurrentWhenActive="page"
+        >Work queue</a
+      >
+    } @else {
+      <a
+        mat-button
+        routerLink="/my-claims"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        >My claims</a
+      >
+      <a
+        mat-button
+        routerLink="/my-claims/new"
+        routerLinkActive="active-link"
+        ariaCurrentWhenActive="page"
+        >Report an incident</a
+      >
+    }
+  </nav>
+
   <span class="rounded-full px-3 py-1 text-sm" [class]="apiStatusClass()" role="status"
     >API: {{ apiStatus() }}</span
   >
+
+  <mat-form-field subscriptSizing="dynamic" class="w-56 text-base">
+    <mat-label>Acting as</mat-label>
+    <mat-select [value]="currentUser.id()" (selectionChange)="actAs($event.value)">
+      @for (group of userGroups; track group.role) {
+        <mat-optgroup [label]="group.label">
+          @for (user of group.users; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }}</mat-option>
+          }
+        </mat-optgroup>
+      }
+    </mat-select>
+  </mat-form-field>
 </mat-toolbar>
 
 <main class="container mx-auto p-4 md:p-6">
-  <!-- TODO: claimant and claims-staff feature routes -->
   <router-outlet />
 </main>

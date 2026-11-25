@@ -1,18 +1,48 @@
-import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { injectSystemInfoQuery } from './core/api/system.queries';
+import { CurrentUser, DEMO_USERS, ROLE_HOME } from './core/session/current-user';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatToolbarModule, MatIconModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+  ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  /** Backend connectivity shown in the shell. TODO: remove once real features exist. */
+  private readonly router = inject(Router);
+  protected readonly currentUser = inject(CurrentUser);
+
+  /** No authentication yet: pick which demo user the app acts as. */
+  protected readonly userGroups = [
+    {
+      role: 'Claimant',
+      label: 'Claimants',
+      users: DEMO_USERS.filter((u) => u.role === 'Claimant'),
+    },
+    {
+      role: 'Officer',
+      label: 'Claims staff',
+      users: DEMO_USERS.filter((u) => u.role === 'Officer'),
+    },
+  ];
+
+  /** Backend connectivity shown in the shell. */
   protected readonly systemInfo = injectSystemInfoQuery();
 
   protected readonly apiStatus = computed(() => {
@@ -27,4 +57,9 @@ export class App {
       ? 'bg-error-container text-on-error-container'
       : 'bg-primary-container text-on-primary-container';
   });
+
+  protected actAs(id: string): void {
+    this.currentUser.select(id);
+    void this.router.navigateByUrl(ROLE_HOME[this.currentUser.user().role]);
+  }
 }
