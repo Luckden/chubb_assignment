@@ -305,3 +305,11 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** —
+
+### 2026-11-25: Seed data on a fresh clone
+
+- **Asked:** A clone on another PC had no data after `docker compose up --build`.
+- **Accepted:** —
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** —

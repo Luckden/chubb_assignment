@@ -27,6 +27,7 @@ public static class DemoUsers
         new(Bob, "Bob Lim (claimant)", UserRole.Claimant),
         new(Carol, "Carol Wong (officer)", UserRole.Officer, Team),
         new(Dave, "Dave Ng (officer)", UserRole.Officer, Team),
+        new(SampleClaimant, "SampleClaimant", UserRole.Claimant),
         new(SampleStaff, "Sample Staff", UserRole.Officer, SampleTeam),
     ];
 }

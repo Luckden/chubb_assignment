@@ -32,8 +32,8 @@ We will load the data through an opt-in seeder, `SampleDataSeeder`, mapping it o
   System events (the payments service) are attributed to the claim's officer.
 - **Events:** loading goes through `Claim.Restore`, which checks no lifecycle rules and raises no events. The facts
   predate the system, so nothing reaches the outbox, Kafka or the notifications table.
-- **Switch:** `Database:SeedSampleData`. It is off, including in `appsettings.Development.json`. Loading skips rows
-  already present. Integration tests assume a near-empty database.
+- **Switch:** `Database:SeedSampleData`, on in `appsettings.Development.json` (so Docker Compose and `dotnet run`).
+  Loading skips rows already present. Integration tests use the Testing environment, which leaves it off.
 
 ## Consequences
 
@@ -41,8 +41,9 @@ We will load the data through an opt-in seeder, `SampleDataSeeder`, mapping it o
   data set's own figure of USD 1.6M, which also counts reserves.
 - The mapping loses information: a reopened claim has lost its "reopened" marker, and the deductible and sum insured
   checks the data set was designed for (`edge_cases.csv`) cannot be exercised.
-- SampleClaimant and every claim filed by that user were removed. Acting as keeps Alice, Bob, Carol, Dave and Sample
-  Staff. Sample Staff's team is `sample`, so Carol and Dave's team is unchanged.
+- Acting as keeps Alice, Bob, Carol and Dave, and adds SampleClaimant and Sample Staff. A sample claim names one of
+  those two. Sample Staff's team is `sample`, so Carol and Dave's team is unchanged. Alice's own list stays empty
+  until she reports an incident.
 - **With more time:** policies and reserves (ADR-0011's follow-up), which would make the dropped files usable, and
   `invalid_claim_submissions.csv` as validation test fixtures.
 

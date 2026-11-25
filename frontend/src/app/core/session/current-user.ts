@@ -17,6 +17,7 @@ export const DEMO_USERS: readonly DemoUser[] = [
   { id: '00000000-0000-7000-8000-000000000002', name: 'Bob Lim', role: 'Claimant' },
   { id: '00000000-0000-7000-8000-000000000011', name: 'Carol Wong', role: 'Officer' },
   { id: '00000000-0000-7000-8000-000000000012', name: 'Dave Ng', role: 'Officer' },
+  { id: '00000000-0000-7000-8000-000000000021', name: 'SampleClaimant', role: 'Claimant' },
   { id: '00000000-0000-7000-8000-000000000022', name: 'Sample Staff', role: 'Officer' },
 ];
 

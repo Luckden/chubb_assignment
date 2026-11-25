@@ -42,9 +42,9 @@ docker compose up --build -d
 
 The first run downloads images and builds the API and SPA: allow **5–10 minutes**. Later runs take seconds.
 
-On startup the API creates the database schema, seeds the demo users, and creates its Kafka topics. About 1,400
-synthetic claims load only when `Database:SeedSampleData` is on
-([ADR-0021](adr/0021-load-synthetic-claims-data-into-the-current-model.md)); it is off. Check that it is ready:
+On startup the API creates the database schema, seeds the demo users and about 1,400 synthetic claims
+([ADR-0021](adr/0021-load-synthetic-claims-data-into-the-current-model.md)), and creates its Kafka topics. Set
+`Database__SeedSampleData: false` on the `api` service to skip the claims. Check that it is ready:
 
 ```bash
 docker compose ps                         # api, web, postgres, kafka, kafka-ui: running (postgres, kafka: healthy)
@@ -66,8 +66,9 @@ There is no sign-in. Use **Acting as** in the toolbar.
 | User | Role |
 | --- | --- |
 | Alice Tan, Bob Lim | Claimants |
+| SampleClaimant | Claimant for the seeded claims |
 | Carol Wong, Dave Ng | Claims officers (same team) |
-| Sample Staff | Officer |
+| Sample Staff | Officer for the seeded claims |
 
 1. As **Alice Tan**, choose **Report an incident**, fill in the form and submit. The claim opens with its history.
 2. Switch to **Carol Wong**. Open **Work queue → Unassigned**, open the claim and choose **Pick up**.
