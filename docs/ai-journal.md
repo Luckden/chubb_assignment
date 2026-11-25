@@ -217,3 +217,14 @@ daisyUI skill.
 - **Overrode:** —
 - **Open:** A full `docker compose` run is not done. Something already listens on port 4200 and served an older build,
   so `npm run e2e` reused it and failed. I did not stop it.
+
+### 2026-11-25: Full docker compose check
+
+- **Asked:** The full `docker compose` run with Kafka auto-create off.
+- **Accepted:** Rebuilding the existing stack (kafka, api, web recreated; volumes kept), which also tested the
+  migrations on a database with data.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** The first run failed: the naming convention renamed EF's migration-history columns, so the API could not
+  start on an existing database. Fixed with a guarded one-off rename at startup, and ADR-0019 corrected. The real stack
+  then migrated, created both topics, published all three events in order and produced the notification.

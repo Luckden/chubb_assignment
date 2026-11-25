@@ -30,6 +30,8 @@ public static class DatabaseInitializer
         var db = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<ClaimsDbContext>>();
 
+        await RenameLegacyHistoryColumnsAsync(db, cancellationToken);
+
         logger.LogInformation("Applying database migrations");
         await db.Database.MigrateAsync(cancellationToken);
 
@@ -39,4 +41,25 @@ public static class DatabaseInitializer
             await seeder.SeedAsync(db, cancellationToken);
         }
     }
+
+    /// <summary>
+    /// ADR-0019: the snake_case naming convention also applies to EF's own history table. A database created before it
+    /// has the columns <c>MigrationId</c> and <c>ProductVersion</c>, which EF could no longer read. Renames them once.
+    /// Does nothing on a new database. Runs only where <c>Database:MigrateOnStartup</c> is on (development and tests).
+    /// </summary>
+    private static Task RenameLegacyHistoryColumnsAsync(ClaimsDbContext db, CancellationToken cancellationToken) =>
+        db.Database.ExecuteSqlRawAsync(
+            """
+            DO $$
+            BEGIN
+                IF EXISTS (
+                    SELECT 1 FROM information_schema.columns
+                    WHERE table_name = '__EFMigrationsHistory' AND column_name = 'MigrationId')
+                THEN
+                    ALTER TABLE "__EFMigrationsHistory" RENAME COLUMN "MigrationId" TO migration_id;
+                    ALTER TABLE "__EFMigrationsHistory" RENAME COLUMN "ProductVersion" TO product_version;
+                END IF;
+            END $$;
+            """,
+            cancellationToken);
 }

@@ -22,7 +22,10 @@ index filter `published_at IS NULL`) uses the snake_case names.
 
 - Hand-written SQL and database tools need no quoting.
 - One extra package. A renamed property needs no manual column mapping.
-- The rename migration is one-off; databases created before it are migrated in place.
+- The convention also renames EF's own `__EFMigrationsHistory` columns, so a database created before it could not be
+  read by EF at all (found by running `docker compose up` on an existing volume). `DatabaseInitializer` renames those two
+  columns once before migrating. It runs only where `Database:MigrateOnStartup` is on; a database migrated any other
+  way needs the same two `ALTER TABLE ... RENAME COLUMN` statements by hand.
 
 ## Alternatives considered
 
