@@ -39,6 +39,8 @@ or email threads (ADR-0010), policies, reserves, currencies and attachments (ADR
 
 ## Run
 
+Step-by-step for a fresh machine, with troubleshooting and how to stop it: **[docs/run-guide.md](docs/run-guide.md)**.
+
 **Everything in containers**
 
 ```bash

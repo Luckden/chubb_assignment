@@ -6,6 +6,7 @@
 | [adr/](adr/README.md) | **ADRs**: short, immutable records of decisions that were made, and why. |
 | [design/](design/README.md) | **Design documents**, numbered in the order they are written: requirements traceability matrix, use cases, ERD, claim lifecycle. |
 | [scope-and-prioritisation.md](scope-and-prioritisation.md) | Objectives, deliverables, constraints and the brief's design questions. |
+| [run-guide.md](run-guide.md) | Clone, run, try and stop the platform on a fresh machine. |
 | [ai-journal.md](ai-journal.md) | Running log of AI-assisted work: what was asked, accepted, challenged and overridden. |
 
 ## Flow: RFC → ADR
