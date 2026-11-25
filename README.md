@@ -3,7 +3,10 @@
 Take-home assessment: a claims platform for claimants and claims staff.
 Angular SPA, .NET API, PostgreSQL and Kafka, run locally with Docker Compose.
 
-> Status: **scaffold only**. No domain features yet. Decisions are tracked in [docs/adr](docs/adr/README.md).
+> Status: **backend Must slice done** (submit, pick up, request and provide information, settle or reject, track).
+> Not built yet: the team workload view, Kafka events for claim transitions, and the claim screens in the SPA.
+> Decisions are tracked in [docs/adr](docs/adr/README.md); the requirements are traced in
+> [docs/design](docs/design/01-requirements-traceability-matrix.md).
 
 ## Prerequisites
 
@@ -32,12 +35,45 @@ cd frontend && npm ci && npm start               # http://localhost:4200
 | URL | What |
 | --- | --- |
 | http://localhost:4200 | Angular SPA (shows API connectivity) |
-| http://localhost:5080/api/system/info | Placeholder API endpoint |
+| http://localhost:5080/api/claims | Claims API (see [Try the API](#try-the-api)) |
+| http://localhost:5080/api/system/info | Service information |
 | http://localhost:5080/health/live, /health/ready | Liveness, and readiness (checks Postgres) |
 | http://localhost:5080/openapi/v1.json | OpenAPI document (Development only) |
 | http://localhost:8081 | Kafka UI |
 
 Override ports and credentials by copying [.env.example](.env.example) to `.env`.
+
+## Try the API
+
+There is no authentication yet. Each request names the acting user, and the API checks that the user exists and has
+the right role. Four demo users are seeded on startup (Development and tests):
+
+| User | Role | Id |
+| --- | --- | --- |
+| Alice | Claimant | `00000000-0000-7000-8000-000000000001` |
+| Bob | Claimant | `00000000-0000-7000-8000-000000000002` |
+| Carol | Officer | `00000000-0000-7000-8000-000000000011` |
+| Dave | Officer | `00000000-0000-7000-8000-000000000012` |
+
+| Method and path | What | Requirement |
+| --- | --- | --- |
+| `POST /api/claims` | Report an incident (claimant) | R1 |
+| `GET /api/claims?claimantId=&assigneeId=&status=&unassigned=` | List claims, oldest first | R2, R5 |
+| `GET /api/claims/{id}` | Track a claim: status, history, information requests, decision | R2, R4 |
+| `POST /api/claims/{id}/pick-up` | Officer picks up a claim | R5 |
+| `POST /api/claims/{id}/information-requests` | Assigned officer asks the claimant a question | R6 |
+| `POST /api/claims/{id}/information-response` | Claimant answers the open question | R3 |
+| `POST /api/claims/{id}/settle` | Assigned officer settles (reason optional) | R7 |
+| `POST /api/claims/{id}/reject` | Assigned officer rejects (reason required) | R7 |
+
+Errors are `ProblemDetails`: 400 validation, 403 wrong user or role, 404 unknown claim, 409 illegal state change or a
+concurrent update. The lifecycle is in [docs/design/04-claim-lifecycle.md](docs/design/04-claim-lifecycle.md).
+
+```bash
+curl -X POST http://localhost:5080/api/claims -H "Content-Type: application/json" -d '{
+  "claimantId": "00000000-0000-7000-8000-000000000001", "type": "Motor", "incidentDate": "2026-11-20",
+  "description": "Rear-ended at a junction", "claimedAmount": 1200 }'
+```
 
 ## Test
 
@@ -67,7 +103,7 @@ Commit both after any API change.
 ```
 backend/      .NET 10 solution (Claims.Api + tests)
 frontend/     Angular 21 workspace (claims-web)
-docs/         RFCs, ADRs, architecture, AI journal
+docs/         RFCs, ADRs, design docs (RTM, use cases, ERD, lifecycle), AI journal
 AGENTS.md     Instructions for AI coding agents (CLAUDE.md imports it)
 .mcp.json     MCP servers (Angular CLI, Playwright) for Claude Code
 ```

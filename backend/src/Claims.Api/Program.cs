@@ -1,5 +1,9 @@
+using System.Text.Json.Serialization;
+using Claims.Api.Application.Claims;
+using Claims.Api.Controllers;
 using Claims.Api.Infrastructure.Messaging;
 using Claims.Api.Infrastructure.Persistence;
+using Claims.Api.Infrastructure.Persistence.Seeders;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +15,25 @@ var connectionString = builder.Configuration.GetConnectionString("ClaimsDb")
 
 // --- Persistence -----------------------------------------------------------
 builder.Services.AddDbContext<ClaimsDbContext>(options => options.UseNpgsql(connectionString));
-// Seeders: register implementations of IDataSeeder here, e.g. builder.Services.AddScoped<IDataSeeder, DemoDataSeeder>();
+// Seeders run on every startup when Database:MigrateOnStartup is true, so they must be idempotent.
+builder.Services.AddScoped<IDataSeeder, DemoUserSeeder>();
 
 // --- Application -----------------------------------------------------------
 // Validators (AbstractValidator<T>) are discovered from this assembly. Call them from application services.
 builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTypes: true);
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<ClaimService>();
 
 // --- Messaging (Kafka) -----------------------------------------------------
 builder.Services.AddKafkaMessaging(builder.Configuration);
 
 // --- Web -------------------------------------------------------------------
-builder.Services.AddControllers();
+// Enums travel as strings (readable JSON and a readable OpenAPI schema).
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
 const string FrontendCorsPolicy = "frontend";
 builder.Services.AddCors(options => options.AddPolicy(FrontendCorsPolicy, policy => policy
