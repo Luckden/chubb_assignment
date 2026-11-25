@@ -207,3 +207,13 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** Notification e2e and a full `docker compose` run are not done.
+
+### 2026-11-25: Notification e2e
+
+- **Asked:** The notification e2e spec, from the remaining RFC-0002 gaps.
+- **Accepted:** Two Playwright specs with the API mocked: a claimant sees one unread notification, opens it, lands on
+  the claim and the bell drops to zero; an officer has no bell.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** A full `docker compose` run is not done. Something already listens on port 4200 and served an older build,
+  so `npm run e2e` reused it and failed. I did not stop it.
