@@ -198,3 +198,12 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** Broker-down test, notification e2e and a full `docker compose` run are not done.
+
+### 2026-11-25: Broker-down test
+
+- **Asked:** The broker-down test, from the remaining RFC-0002 gaps.
+- **Accepted:** A test with its own Postgres and Kafka containers that stops the broker, submits a claim (201), checks
+  the event waits in the outbox, restarts the broker and checks the event reaches the topic.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Notification e2e and a full `docker compose` run are not done.
