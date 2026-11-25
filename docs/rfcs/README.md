@@ -16,5 +16,5 @@ Statuses: `Draft` → `In Review` → `Accepted` | `Rejected` | `Withdrawn`
 
 | # | Title | Status | Resulting ADRs |
 | --- | --- | --- | --- |
-| [0001](0001-domain-model-and-service-boundaries.md) | Domain model and service boundaries | Draft | |
+| [0001](0001-backend-architecture.md) | Backend architecture (.NET Web API and EF Core) | Accepted | [0006](../adr/0006-backend-layered-structure.md), [0007](../adr/0007-application-services-and-ef-core-conventions.md) |
 | [0002](0002-sync-vs-async-communication.md) | Synchronous vs asynchronous communication (REST and Kafka) | Draft | |

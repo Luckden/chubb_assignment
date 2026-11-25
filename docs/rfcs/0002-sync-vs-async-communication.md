@@ -6,7 +6,7 @@
 | **Author(s)** | |
 | **Created** | 2026-11-25 |
 | **Updated** | 2026-11-25 |
-| **Related** | [RFC-0001](0001-domain-model-and-service-boundaries.md) |
+| **Related** | [RFC-0001](0001-backend-architecture.md) |
 
 ## Summary
 
