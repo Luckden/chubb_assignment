@@ -23,3 +23,11 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0005](0005-use-angular-material-for-ui-components.md) | Use Angular Material for UI components | Proposed |
 | [0006](0006-backend-layered-structure.md) | Backend as one layered project with feature folders | Accepted |
 | [0007](0007-application-services-and-ef-core-conventions.md) | Application services, no repositories, rich domain and EF Core conventions | Accepted |
+| [0008](0008-authorisation-by-role-and-ownership-no-rebac.md) | Authorisation by role and ownership checks, no ReBAC | Accepted |
+| [0009](0009-authentication-deferred.md) | Authentication deferred; requests name the acting user | Accepted |
+| [0010](0010-information-requests-as-structured-questions-not-chat.md) | Information requests are structured questions, not chat or email | Accepted |
+| [0011](0011-minimal-claim-data-model.md) | Minimal claim data model | Accepted |
+| [0012](0012-claims-handling-rules-left-out.md) | Real-world claims handling rules are left out | Accepted |
+| [0013](0013-test-conventions-and-single-test-project.md) | Test conventions and a single test project | Accepted |
+| [0014](0014-workload-views-computed-on-read-from-status-history.md) | Workload views are computed on read from the status history | Proposed |
+| [0015](0015-exposure-is-claimed-amount-on-open-claims.md) | Liability exposure is the claimed amount on open claims | Accepted |

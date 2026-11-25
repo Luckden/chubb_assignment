@@ -105,3 +105,49 @@ daisyUI skill.
   - The sections the AI added to the scope doc (in scope, acceptance criteria, assumptions, risks, time budget).
     Removed, and the RTM moved out into `docs/design/`.
 
+
+### 2026-11-25: Backend implementation, tests and tooling
+
+- **Asked:** To implement what RFC-0001 and the ADRs planned (domain, EF Core, services, controllers). How the tests
+  run (`dotnet test`, `dotnet run` or `dotnet build`), and for the domain tests to be run and extended. Whether
+  docker compose is wired for all the infrastructure. Whether to switch to minimal APIs, and whether to use
+  `dotnet/skills`. To update the docs to match the code. Whether my tests follow Microsoft's unit testing guidance.
+  Whether the decisions are recorded, for the journal to always be updated, and for each deliberate omission to get
+  its own ADR.
+- **Accepted:**
+  - Backend steps 1 to 4 for R1–R7, and RFC-0001, ADR-0006 and ADR-0007 as Accepted.
+  - Controllers, not minimal APIs. The alternative is a row in RFC-0001.
+  - Tests named `R{requirement}_{Method}_{Scenario}_{ExpectedBehavior}`, with one act each and shared constants.
+  - Running the tests in Docker because the host blocks the test DLL.
+  - One ADR per deliberate omission (ADR-0008 to ADR-0013: no ReBAC, authentication deferred, information requests
+    not chat, minimal data model, claims handling rules left out, test conventions). All accepted.
+- **Challenged:**
+  - Whether the tests follow Microsoft's guidance. The AI found five gaps: naming, a separate unit-test project,
+    several acts per test, logic in tests, and magic values.
+  - Whether decisions are recorded. The AI found the journal had no entry for this work and that the deliberate
+    omissions (ReBAC, chat, auth, outbox, attachments, BNM deadlines) were only in the chat.
+- **Overrode:** The AI's reading of "implement" as adding the minimal API row. I meant the plan in the RFC and ADRs.
+- **Open:** Whether to use `dotnet/skills` (nothing installed). The unit and integration test projects are not split
+  yet.
+
+### 2026-11-25: Audit of RFC-0002 (Kafka) before implementation
+
+- **Asked:** To audit RFC-0002 and the related ADRs before any Kafka work starts, then to draft the proposal.
+- **Accepted:** Claimant notifications as the Kafka consumer, although the brief doesn't name them, over a smaller
+  audit-log consumer. The rest of the draft (REST for commands and queries, lifecycle events on one topic through a
+  transactional outbox, polling in the frontend) is not reviewed yet.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Reviewing the rest of the draft. ADR-0002 and ADR-0003 are still Proposed, and the outbox omission discussed earlier had no ADR.
+
+### 2026-11-25: Officer workload (D6) and liability exposure (D7)
+
+- **Asked:** Which of the brief's design questions are still uncovered. Whether D6 and D7 are analytics, and whether
+  D6 is mostly UI (the answer: D6 is the officer's own queue plus R8's team analytics, and needs time in status from
+  the backend). Then an RFC and ADRs for D6 and D7 as the next work. An explanation of the exposure decision.
+- **Accepted:** "Claimed exposure" for D7: the sum of `claimed_amount` on open claims, labelled as an upper bound,
+  over adding a reserve now (which would reverse ADR-0011 and cost build time). Officers see the exposure view; no
+  Manager role is added. ADR-0015 accepted. The rest of RFC-0003 and ADR-0014 is not reviewed yet.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Which performance figures R8 shows. Whether officers, with no Manager role, see the exposure view.
