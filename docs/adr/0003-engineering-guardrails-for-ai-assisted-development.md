@@ -1,6 +1,6 @@
 # ADR-0003: Engineering guardrails for AI-assisted development
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [ADR-0002](0002-baseline-technology-stack.md)

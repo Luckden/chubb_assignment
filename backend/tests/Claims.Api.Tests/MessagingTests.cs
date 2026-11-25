@@ -12,7 +12,7 @@ public class MessagingTests(ClaimsApiFactory factory)
     private sealed record PingEvent(Guid Id, string Message);
 
     [Fact]
-    public async Task Published_event_can_be_consumed_from_kafka()
+    public async Task C3_Publish_Event_CanBeConsumedFromKafka()
     {
         var topic = $"test-{Guid.NewGuid():N}";
         var sent = new PingEvent(Guid.NewGuid(), "hello");

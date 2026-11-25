@@ -1,6 +1,6 @@
 # ADR-0016: REST for commands and queries, Kafka for lifecycle events through a transactional outbox
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [RFC-0002](../rfcs/0002-sync-vs-async-communication.md), [ADR-0002](0002-baseline-technology-stack.md), [ADR-0007](0007-application-services-and-ef-core-conventions.md), [ADR-0018](0018-claimant-notifications-built-by-a-kafka-consumer.md)

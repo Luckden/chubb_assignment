@@ -19,6 +19,7 @@ public sealed class OutboxRelay(
     ILogger<OutboxRelay> logger) : BackgroundService
 {
     private const int BatchSize = 100;
+    private static readonly TimeSpan LagWarningThreshold = TimeSpan.FromSeconds(30);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -59,6 +60,17 @@ public sealed class OutboxRelay(
         if (pending.Count == 0)
         {
             return;
+        }
+
+        // Lag is how long the oldest unpublished event has waited (RFC-0002 section 9).
+        var lag = clock.GetUtcNow() - pending[0].OccurredAt;
+        if (lag > LagWarningThreshold)
+        {
+            logger.LogWarning("Outbox lag is {Lag}: {Count} events waiting", lag, pending.Count);
+        }
+        else
+        {
+            logger.LogDebug("Outbox lag is {Lag}: {Count} events waiting", lag, pending.Count);
         }
 
         await topics.EnsureCreatedAsync(cancellationToken);

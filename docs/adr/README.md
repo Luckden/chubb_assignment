@@ -17,8 +17,8 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | # | Title | Status |
 | --- | --- | --- |
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions | Accepted |
-| [0002](0002-baseline-technology-stack.md) | Baseline technology stack | Proposed |
-| [0003](0003-engineering-guardrails-for-ai-assisted-development.md) | Engineering guardrails for AI-assisted development | Proposed |
+| [0002](0002-baseline-technology-stack.md) | Baseline technology stack | Accepted |
+| [0003](0003-engineering-guardrails-for-ai-assisted-development.md) | Engineering guardrails for AI-assisted development | Accepted |
 | [0004](0004-frontend-ui-and-server-state-libraries.md) | Frontend UI and server-state libraries | Superseded by 0005 |
 | [0005](0005-use-angular-material-for-ui-components.md) | Use Angular Material for UI components | Proposed |
 | [0006](0006-backend-layered-structure.md) | Backend as one layered project with feature folders | Accepted |
@@ -28,10 +28,11 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0010](0010-information-requests-as-structured-questions-not-chat.md) | Information requests are structured questions, not chat or email | Accepted |
 | [0011](0011-minimal-claim-data-model.md) | Minimal claim data model | Accepted |
 | [0012](0012-claims-handling-rules-left-out.md) | Real-world claims handling rules are left out | Accepted |
-| [0013](0013-test-conventions-and-single-test-project.md) | Test conventions and a single test project | Accepted |
+| [0013](0013-test-conventions-and-single-test-project.md) | Test conventions and a single test project | Accepted (amended by 0020) |
 | [0014](0014-workload-views-computed-on-read-from-status-history.md) | Workload views are computed on read from the status history | Proposed |
 | [0015](0015-exposure-is-claimed-amount-on-open-claims.md) | Liability exposure is the claimed amount on open claims | Accepted |
-| [0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md) | REST for commands and queries, Kafka for lifecycle events through a transactional outbox | Proposed |
-| [0017](0017-frontend-learns-of-changes-by-polling.md) | The frontend learns of changes by polling | Proposed |
-| [0018](0018-claimant-notifications-built-by-a-kafka-consumer.md) | Claimant notifications are built by a Kafka consumer | Proposed |
-| [0019](0019-snake-case-database-names.md) | Database tables and columns use snake_case | Proposed |
+| [0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md) | REST for commands and queries, Kafka for lifecycle events through a transactional outbox | Accepted |
+| [0017](0017-frontend-learns-of-changes-by-polling.md) | The frontend learns of changes by polling | Accepted |
+| [0018](0018-claimant-notifications-built-by-a-kafka-consumer.md) | Claimant notifications are built by a Kafka consumer | Accepted |
+| [0019](0019-snake-case-database-names.md) | Database tables and columns use snake_case | Accepted |
+| [0020](0020-constraint-traced-tests-use-c-prefix.md) | Tests for infrastructure constraints use a `C{n}_` prefix | Accepted |

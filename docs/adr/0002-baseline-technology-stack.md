@@ -1,6 +1,6 @@
 # ADR-0002: Baseline technology stack
 
-- **Status:** Proposed <!-- review and accept, or amend, before building on it -->
+- **Status:** Accepted
 - **Date:** 2026-11-24
 - **Deciders:** Project owner
 - **Related:** —

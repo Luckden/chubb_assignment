@@ -245,4 +245,4 @@ Built as proposed. Recorded in [ADR-0016](../adr/0016-rest-for-commands-kafka-fo
 Differences from the draft: column names are snake_case as drafted, through a naming convention for the whole schema
 ([ADR-0019](../adr/0019-snake-case-database-names.md)); the producer is created on first use so the host starts without a broker; the consumer
 subscribes to the event topic directly, so `Kafka:SubscribeTopics` was removed. Not built: outbox clean-up, a test that
-stops the broker, and ADR-0013's constraint-traced test naming is used (`C3_*`) without amending the ADR text yet.
+stops the broker, and the constraint-traced test names (`C3_*`) are covered by [ADR-0020](../adr/0020-constraint-traced-tests-use-c-prefix.md).

@@ -1,6 +1,6 @@
 # ADR-0018: Claimant notifications are built by a Kafka consumer
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [RFC-0002](../rfcs/0002-sync-vs-async-communication.md), [ADR-0010](0010-information-requests-as-structured-questions-not-chat.md), [ADR-0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md)

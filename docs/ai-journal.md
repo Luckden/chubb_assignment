@@ -171,3 +171,30 @@ daisyUI skill.
 - **Challenged:** That the schema followed SQL convention. Only the table names did.
 - **Overrode:** —
 - **Open:** Accepting ADR-0019.
+
+### 2026-11-25: ADR acceptance
+
+- **Asked:** To mark the ADRs accepted.
+- **Accepted:** ADR-0002, 0003, 0016, 0017, 0018 and 0019 (the ones left open by the RFC-0002 work).
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** ADR-0005 and ADR-0014 are still Proposed. ADR-0013 still needs the `C3_*` naming exception.
+
+### 2026-11-25: Constraint-traced test naming (ADR-0020)
+
+- **Asked:** To work on what was blocked on the ADR acceptance.
+- **Accepted:** The AI's reading that this meant the ADR-0013 amendment for `C3_*` tests, written as ADR-0020
+  (Accepted) because ADR-0013's text is frozen. The existing Kafka round-trip test is renamed to follow it.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Whether something else was meant. ADR-0005 and ADR-0014 are still Proposed.
+
+### 2026-11-25: Closing RFC-0002 gaps
+
+- **Asked:** For a decision to iterate on, then chose outbox lag logging and design doc 4 over the broker-down test,
+  notification e2e and full-stack check, in one commit.
+- **Accepted:** Lag logged by the relay (warning above 30 s); design doc 4's candidate events replaced by the
+  catalogue.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Broker-down test, notification e2e and a full `docker compose` run are not done.

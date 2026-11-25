@@ -54,12 +54,23 @@ history across claims.
 - A rejection must give a reason. A settlement reason is optional.
 - Illegal moves return 409, a wrong user returns 403 (see the API error mapping in the README).
 
-## Candidate events
+## Events
 
-Past-tense facts, keyed by claim id, per the messaging convention in AGENTS.md. Which of these go on Kafka and which
-stay synchronous is decided in RFC-0002, not here.
+Each transition raises one past-tense event, published to Kafka topic `claims.claim-events` keyed by claim id
+([RFC-0002](../rfcs/0002-sync-vs-async-communication.md), [ADR-0016](../adr/0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md)).
+Commands themselves stay synchronous REST. The records are in `Domain/Events/ClaimEvents.cs`.
 
-`ClaimSubmitted`, `ClaimPickedUp`, `InformationRequested`, `InformationProvided`, `ClaimSettled`, `ClaimRejected`.
+| Transition | Event | Data besides the envelope |
+| --- | --- | --- |
+| to Submitted | `ClaimSubmitted` | `claimNumber`, `claimantId`, `type`, `incidentDate`, `claimedAmount` |
+| Submitted to UnderReview | `ClaimPickedUp` | `assigneeId` |
+| UnderReview to InfoRequested | `InformationRequested` | `informationRequestId`, `question` |
+| InfoRequested to UnderReview | `InformationProvided` | `informationRequestId` |
+| UnderReview to Settled | `ClaimSettled` | `reason` |
+| UnderReview to Rejected | `ClaimRejected` | `reason` |
+
+The envelope is `eventId`, `eventType`, `schemaVersion`, `occurredAt`, `claimId`, `data`. The notifications consumer
+reads `InformationRequested`, `ClaimSettled` and `ClaimRejected` ([ADR-0018](../adr/0018-claimant-notifications-built-by-a-kafka-consumer.md)).
 
 ## References
 

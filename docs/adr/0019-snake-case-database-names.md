@@ -1,6 +1,6 @@
 # ADR-0019: Database tables and columns use snake_case
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [ADR-0007](0007-application-services-and-ef-core-conventions.md), [ADR-0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md)

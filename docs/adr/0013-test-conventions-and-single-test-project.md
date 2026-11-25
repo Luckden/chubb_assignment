@@ -1,6 +1,6 @@
 # ADR-0013: Test conventions and a single test project
 
-- **Status:** Accepted
+- **Status:** Accepted (amended by [ADR-0020](0020-constraint-traced-tests-use-c-prefix.md))
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [ADR-0003](0003-engineering-guardrails-for-ai-assisted-development.md), [Design doc 1](../design/01-requirements-traceability-matrix.md)
