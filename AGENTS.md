@@ -41,8 +41,10 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
   the OpenAPI schema is complete. After API changes, commit the regenerated `backend/openapi/claims-api.json` and
   `frontend/src/app/core/api/generated/schema.ts`; CI fails if they are stale. Never hand-write DTO interfaces in the
   frontend: alias the generated types in `core/api/api-types.ts` and call them with `HttpClient`.
-- **Messaging:** publish through `IEventPublisher`; topic names live in `Infrastructure/Messaging/Topics.cs`.
-  Events are past-tense facts (`ClaimSubmitted`), keyed by aggregate id.
+- **Messaging:** events are past-tense facts (`ClaimSubmitted`), keyed by aggregate id (ADR-0016). The `Claim`
+  aggregate raises them (`Domain/Events/`); `ClaimsDbContext` writes them to the outbox in the same `SaveChanges`,
+  and `OutboxRelay` publishes them through `IEventPublisher`. Don't publish from application code. Topic names live
+  in `Infrastructure/Messaging/Topics.cs`. A consumer is an `IEventHandler` and must be idempotent (at-least-once).
 - **Frontend:** follow `frontend/AGENTS.md` (standalone, signals, OnPush, `inject()`, native control flow).
   - **Components:** Angular Material 21 (Material 3). Use Material components (`mat-toolbar`, `mat-table`,
     `mat-form-field`, `mat-dialog`, ...) before building your own. Import each component's module or directive
@@ -65,6 +67,8 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
     Call `fixture.detectChanges()`, flush `HttpTestingController`, *then* `await fixture.whenStable()`. An in-flight
     query counts as pending, so awaiting first deadlocks.
 - **Tests:** add or adjust tests with every behaviour change.
+  - Backend test names trace back to the scope doc: `R{requirement}_`, `C{constraint}_` or `D{design question}_`,
+    then `{Method}_{Scenario}_{ExpectedBehavior}`, with one act per test (ADR-0013, ADR-0020).
   - Backend tests use the shared `ClaimsApiFactory` (`[Collection(ApiCollection.Name)]`), which runs the real API
     against Testcontainers Postgres and Kafka. Don't mock infrastructure.
   - E2E specs live in `frontend/e2e/*.e2e.ts`. Use role-based locators (`getByRole`), and mock the API with

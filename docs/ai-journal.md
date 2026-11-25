@@ -250,3 +250,14 @@ daisyUI skill.
     a staff Team page.
 - **Challenged:** —
 - **Overrode:** —
+
+### 2026-11-25: Docs brought up to date
+
+- **Asked:** To update all docs to match what is built.
+- **Accepted:** The ERD now shows the notifications and outbox tables; the use cases list each screen; the lifecycle,
+  scope, RFC and design index status lines say what is built; ADR-0005 marked Accepted, since I chose Angular
+  Material earlier; the frontend README replaces the Angular CLI boilerplate; AGENTS.md describes the outbox flow and
+  the `R`/`C`/`D` test name prefixes.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** The RTM Priority column (Must / Should / Won't) is still mine to fill in.

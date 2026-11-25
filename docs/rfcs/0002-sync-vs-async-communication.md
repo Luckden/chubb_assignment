@@ -219,9 +219,8 @@ This is the smallest consumer that a user can see, and it answers the RTM note o
 3. The outbox adds one table, one migration and one hosted service. That is the price of not losing events.
 4. A poll every 10 s per open tab is fine at demo scale, not at production scale.
 5. Single-instance assumption for the relay (section 4).
-6. **Before building:** ADR-0002 and ADR-0003 are still Proposed and this work builds on both. ADR-0013's
-   `R{n}_...` test naming needs an exception for infrastructure tests that trace to a constraint (C3), such as the
-   existing `MessagingTests`.
+6. **Before building (resolved):** ADR-0002 and ADR-0003 were still Proposed and this work builds on both; both are
+   now Accepted. The exception to ADR-0013's `R{n}_...` naming for constraint-traced tests is ADR-0020.
 
 ## Rollout / implementation plan
 

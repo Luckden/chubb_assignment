@@ -1,6 +1,6 @@
 # ADR-0005: Use Angular Material for UI components
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** Supersedes [ADR-0004](0004-frontend-ui-and-server-state-libraries.md) (UI part only)

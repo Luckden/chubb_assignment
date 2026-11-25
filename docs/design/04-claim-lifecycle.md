@@ -1,8 +1,8 @@
 # 4. Claim lifecycle (state diagram)
 
 Defines the statuses of a [claim](03-erd.md) and the transitions between them, with the actor who triggers each one and
-the [use case](02-use-cases.md) it belongs to. This is a **proposal**: the brief doesn't name statuses, so the set below
-is the smallest one that supports R1–R7. Nothing here is final until you confirm it.
+the [use case](02-use-cases.md) it belongs to. The brief doesn't name statuses, so the set below is the smallest one
+that supports R1–R7. It was agreed before it was built.
 
 **Status:** implemented in `Claim.cs` (`Domain/`), with unit tests for every transition and every rejected move.
 

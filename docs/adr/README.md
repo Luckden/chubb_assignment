@@ -20,7 +20,7 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0002](0002-baseline-technology-stack.md) | Baseline technology stack | Accepted |
 | [0003](0003-engineering-guardrails-for-ai-assisted-development.md) | Engineering guardrails for AI-assisted development | Accepted |
 | [0004](0004-frontend-ui-and-server-state-libraries.md) | Frontend UI and server-state libraries | Superseded by 0005 |
-| [0005](0005-use-angular-material-for-ui-components.md) | Use Angular Material for UI components | Proposed |
+| [0005](0005-use-angular-material-for-ui-components.md) | Use Angular Material for UI components | Accepted |
 | [0006](0006-backend-layered-structure.md) | Backend as one layered project with feature folders | Accepted |
 | [0007](0007-application-services-and-ef-core-conventions.md) | Application services, no repositories, rich domain and EF Core conventions | Accepted |
 | [0008](0008-authorisation-by-role-and-ownership-no-rebac.md) | Authorisation by role and ownership checks, no ReBAC | Accepted |

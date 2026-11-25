@@ -4,8 +4,16 @@ One use case per requirement in the [RTM](01-requirements-traceability-matrix.md
 Actors are the two user types in the brief's requirement paragraphs. Mermaid has no native use case diagram, so this is
 a `flowchart` with actors on the outside and use cases inside the system boundary.
 
-**Status:** UC-01 to UC-07 are implemented in the API (see the [RTM](01-requirements-traceability-matrix.md) for endpoints
-and tests). UC-08 is built per RFC-0003: the staff Team page (`/work/team`) over `GET /api/workload`.
+**Status:** all eight are implemented, in the API and in the SPA. The [RTM](01-requirements-traceability-matrix.md)
+lists the endpoint, screen and tests for each.
+
+| UC | Screen |
+| --- | --- |
+| UC-01 | `/my-claims/new` (Report an incident) |
+| UC-02, UC-03, UC-04 | `/my-claims` and `/my-claims/{id}` (claim, answer form, decision), plus the notifications bell |
+| UC-05 | `/work` (queue tabs) and **Pick up** on `/work/{id}` |
+| UC-06, UC-07 | `/work/{id}` (Ask the claimant, Decision) |
+| UC-08 | `/work/team` (team workload, and claimed exposure for D7) |
 
 ## Use case diagram
 
@@ -57,10 +65,11 @@ Not shown in the diagram, to keep it to what the brief states. Dependencies note
 - UC-04 delivers the outcome of UC-07.
 - UC-05 to UC-07 act on claims created by UC-01.
 
-Whether these become `include`/`extend` relationships is a design decision for the claim lifecycle (doc 4).
+They stay plain dependencies, not `include`/`extend` relationships: the claim lifecycle (doc 4) expresses them as
+status transitions.
 
 ## Open
 
-- Specifications per use case (main flow, alternatives, preconditions) are not written yet. Add them for the use cases
-  that go in the Must slice.
+- Specifications per use case (main flow, alternatives, preconditions) were not written. The lifecycle (doc 4) holds
+  the rules and the tests named after each requirement cover the flows, so they were not needed to build.
 - No manager actor: team workload and performance sits under claims staff, as in the brief.

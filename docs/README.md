@@ -20,7 +20,7 @@
                     one or more ADRs (Accepted), each linking back to the RFC
                                       │
                                       ▼
-                    architecture/ docs updated to match
+                    design/ docs updated to match
 ```
 
 - **Write an RFC** when a change is cross-cutting, hard to reverse, or has several viable options worth comparing

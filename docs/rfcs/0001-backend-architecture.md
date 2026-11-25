@@ -56,6 +56,9 @@ backend/src/Claims.Api/
     Messaging/                    IEventPublisher, Kafka implementation (exists)
 ```
 
+As built, `Application/` also has `Notifications/` (RFC-0002), `Workload/` and `Exposure/` (RFC-0003); `Domain/` has
+`Notification` and `Events/`; `Messaging/` has the outbox relay, consumer and topic provisioner.
+
 Dependency direction: `Controllers` → `Application` → `Domain`. `Infrastructure` supplies persistence and messaging.
 `Domain` references nothing outside itself.
 
@@ -127,7 +130,8 @@ Publishing an event after `SaveChanges` is added to this flow by RFC-0002.
 
 ## Rollout / implementation plan
 
-Steps 1 to 4 are done (74 tests pass). Step 5 is done by RFC-0003 (`GET /api/workload`) and step 6 by RFC-0002.
+All six steps are done: steps 1 to 4 here, step 5 by RFC-0003 (`GET /api/workload`) and step 6 by RFC-0002. The
+backend suite has 111 tests.
 There is no authentication yet, so requests name the acting user and the service checks the role.
 
 1. Domain entities and `ClaimStatus` from design docs 3 and 4, with unit tests for the transition rules.

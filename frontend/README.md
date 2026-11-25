@@ -1,59 +1,43 @@
-# ClaimsWeb
+# claims-web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.31.
+The Angular 21 SPA for the claims platform: one app for claimants and claims staff. For how to run the whole stack
+and what the app does, see the [root README](../README.md). Coding conventions are in [AGENTS.md](AGENTS.md) and the
+frontend section of the [root AGENTS.md](../AGENTS.md).
 
-## Development server
+## Commands
 
-To start a local development server, run:
+| Task                                                                        | Command                                                  |
+| --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Dev server (http://localhost:4200, proxies `/api` to http://localhost:5080) | `npm start`                                              |
+| Unit tests (Vitest)                                                         | `npm test`                                               |
+| End-to-end tests (Playwright, API mocked; starts `ng serve` itself)         | `npm run e2e`                                            |
+| End-to-end against the real stack, including `@stack` specs                 | `E2E_BASE_URL=http://localhost:4200 npm run e2e`         |
+| Lint / format                                                               | `npm run lint` / `npm run format` (`format:check` in CI) |
+| Regenerate API types after a backend change                                 | `npm run api:generate` (after `dotnet build backend`)    |
+| Production build                                                            | `npm run build`                                          |
 
-```bash
-ng serve
+The first time, run `npx playwright install chromium`. Playwright reuses any server already on port 4200, so rebuild
+or stop the Docker `web` container before running `npm run e2e`.
+
+## Stack
+
+Angular Material 3 for components (ADR-0005), Tailwind CSS 4 for layout only, TanStack Query for server state, and
+types generated from the backend's OpenAPI document. Open queries poll every 10 seconds (ADR-0017).
+
+## Structure
+
 ```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+src/app/
+  core/
+    api/          generated/schema.ts (never edit), api-types.ts aliases, one *-api.service.ts and
+                  *.queries.ts per API area (claims, notifications, workload, exposure), problem.ts, polling.ts
+    query/        TanStack Query client defaults
+    session/      CurrentUser: the "Acting as" demo user (no authentication, ADR-0009)
+  features/
+    claimant/     /my-claims: list, report an incident, claim detail with answer and decision (UC-01 to UC-04)
+    staff/        /work: queue tabs, claim detail with pick up, ask, settle or reject (UC-05 to UC-07);
+                  /work/team: claimed exposure and team workload (UC-08, D7)
+  shared/         claim building blocks (status chip, facts, activity, table), notifications bell, query state
+  testing/        test fixtures and TestBed setup for pages that use queries
+e2e/              Playwright specs (*.e2e.ts); API mocked with page.route unless tagged @stack
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
