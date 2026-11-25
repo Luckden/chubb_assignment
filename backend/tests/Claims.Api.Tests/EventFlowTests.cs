@@ -93,6 +93,19 @@ public class EventFlowTests(ClaimsApiFactory factory)
             .SingleAsync();
     }
 
+    private const string EmptyPayload = "{}";
+
+    private async Task InsertOutboxRowAsync(Guid id, DateTimeOffset occurredAt, DateTimeOffset? publishedAt)
+    {
+        await using var scope = factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
+        await db.Database.ExecuteSqlAsync(
+            $"""
+            INSERT INTO outbox_messages (id, topic, key, event_type, payload, occurred_at, published_at)
+            VALUES ({id}, 'test-purge', {id.ToString()}, 'Test', {EmptyPayload}, {occurredAt}, {publishedAt})
+            """);
+    }
+
     private async Task ProduceAsync(string topic, string key, string value)
     {
         using var producer = new ProducerBuilder<string, string>(
@@ -155,6 +168,28 @@ public class EventFlowTests(ClaimsApiFactory factory)
         Assert.Equal(1, envelope.SchemaVersion);
         Assert.Equal(claim.ClaimNumber, envelope.Data.GetProperty("claimNumber").GetString());
         Assert.Equal("ClaimSubmitted", Encoding.UTF8.GetString(message.Message.Headers.GetLastBytes("eventType")));
+    }
+
+    [Fact]
+    public async Task C3_Outbox_Purge_DeletesOldPublishedRowsOnly()
+    {
+        var old = DateTimeOffset.UtcNow.AddDays(-30);
+        var oldPublished = Guid.NewGuid();
+        var oldUnpublished = Guid.NewGuid();
+        var recentPublished = Guid.NewGuid();
+        await InsertOutboxRowAsync(oldPublished, old, publishedAt: old);
+        await InsertOutboxRowAsync(oldUnpublished, old, publishedAt: null);
+        await InsertOutboxRowAsync(recentPublished, DateTimeOffset.UtcNow, publishedAt: DateTimeOffset.UtcNow);
+        await using var scope = factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
+
+        await OutboxMessage.PurgePublishedBeforeAsync(db, DateTimeOffset.UtcNow.AddDays(-7), CancellationToken.None);
+
+        var remaining = await db.OutboxMessages
+            .Where(m => m.Id == oldPublished || m.Id == oldUnpublished || m.Id == recentPublished)
+            .Select(m => m.Id)
+            .ToListAsync();
+        Assert.Equal(new[] { oldUnpublished, recentPublished }.Order(), remaining.Order());
     }
 
     // --- Notifications -------------------------------------------------------------------------

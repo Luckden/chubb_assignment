@@ -20,17 +20,26 @@ public sealed class OutboxRelay(
 {
     private const int BatchSize = 100;
     private static readonly TimeSpan LagWarningThreshold = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan PurgeInterval = TimeSpan.FromHours(1);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var interval = TimeSpan.FromMilliseconds(options.Value.OutboxPollIntervalMs);
         using var timer = new PeriodicTimer(interval);
 
+        var nextPurge = DateTimeOffset.MinValue;
+
         do
         {
             try
             {
                 await PublishPendingAsync(stoppingToken);
+
+                if (clock.GetUtcNow() >= nextPurge)
+                {
+                    await PurgePublishedAsync(stoppingToken);
+                    nextPurge = clock.GetUtcNow() + PurgeInterval;
+                }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -42,6 +51,20 @@ public sealed class OutboxRelay(
             }
         }
         while (await WaitAsync(timer, stoppingToken));
+    }
+
+    /// <summary>Deletes published rows older than the retention period (RFC-0002 section 4).</summary>
+    private async Task PurgePublishedAsync(CancellationToken cancellationToken)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
+
+        var cutoff = clock.GetUtcNow().AddDays(-options.Value.OutboxRetentionDays);
+        var deleted = await OutboxMessage.PurgePublishedBeforeAsync(db, cutoff, cancellationToken);
+        if (deleted > 0)
+        {
+            logger.LogInformation("Outbox purge deleted {Count} published events older than {Cutoff}", deleted, cutoff);
+        }
     }
 
     /// <summary>Publishes one batch. Stops at the first failure so events keep their order.</summary>

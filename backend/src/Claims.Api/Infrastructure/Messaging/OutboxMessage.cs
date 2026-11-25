@@ -1,4 +1,5 @@
 using Claims.Api.Domain.Events;
+using Claims.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -31,6 +32,12 @@ public sealed class OutboxMessage
 
     /// <summary>Null until Kafka acknowledged the message.</summary>
     public DateTimeOffset? PublishedAt { get; private set; }
+
+    /// <summary>Deletes rows that were published before <paramref name="cutoff"/>. Unpublished rows are kept.</summary>
+    public static Task<int> PurgePublishedBeforeAsync(ClaimsDbContext db, DateTimeOffset cutoff, CancellationToken cancellationToken) =>
+        db.OutboxMessages
+            .Where(m => m.PublishedAt != null && m.PublishedAt < cutoff)
+            .ExecuteDeleteAsync(cancellationToken);
 
     public static OutboxMessage For(ClaimDomainEvent @event)
     {

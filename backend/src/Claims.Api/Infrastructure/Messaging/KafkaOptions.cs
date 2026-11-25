@@ -14,6 +14,9 @@ public sealed class KafkaOptions
     /// <summary>How often the outbox relay looks for unpublished events.</summary>
     public int OutboxPollIntervalMs { get; init; } = 1000;
 
+    /// <summary>Published outbox rows older than this many days are deleted. Unpublished rows are never deleted.</summary>
+    public int OutboxRetentionDays { get; init; } = 7;
+
     /// <summary>Attempts the consumer makes on one message before it goes to the dead-letter topic.</summary>
     public int ConsumerMaxAttempts { get; init; } = 3;
 

@@ -228,3 +228,12 @@ daisyUI skill.
 - **Open:** The first run failed: the naming convention renamed EF's migration-history columns, so the API could not
   start on an existing database. Fixed with a guarded one-off rename at startup, and ADR-0019 corrected. The real stack
   then migrated, created both topics, published all three events in order and produced the notification.
+
+### 2026-11-25: Outbox clean-up
+
+- **Asked:** "do it" for the one RFC-0002 item left, outbox clean-up.
+- **Accepted:** Deleting published rows after 7 days, hourly, from the relay; unpublished rows are never deleted.
+  The 7 days is the AI's default.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** Whether 7 days is the right retention.

@@ -29,7 +29,9 @@ down.
 - No event is lost and no REST call fails because Kafka is slow or down. Published rows are kept as an event log.
 - Costs one table, one migration and one hosted service.
 - One API instance is assumed. With several, the relay needs `FOR UPDATE SKIP LOCKED` or a leader.
-- Not built: outbox clean-up, a schema registry, outbox lag metrics (only logged).
+- Published rows are kept for 7 days (`Kafka:OutboxRetentionDays`) as an event log; the relay deletes older ones hourly.
+  Unpublished rows are never deleted.
+- Not built: a schema registry, outbox lag metrics (only logged).
 
 ## Alternatives considered
 
