@@ -15,10 +15,14 @@ import type {
 import { ClaimsApiService } from './claims-api.service';
 import { POLL_INTERVAL_MS } from './polling';
 
-/** Query keys for claims. Every mutation invalidates `lists()` and replaces the claim's `detail()`. */
+/**
+ * Query keys for claims. Every mutation invalidates `lists()` and `team()` (the workload and exposure views built
+ * from claims) and replaces the claim's `detail()`.
+ */
 export const claimKeys = {
   all: ['claims'] as const,
   lists: () => [...claimKeys.all, 'list'] as const,
+  team: () => [...claimKeys.all, 'team'] as const,
   list: (filter: ClaimListFilter) => [...claimKeys.lists(), filter] as const,
   detail: (id: string) => [...claimKeys.all, 'detail', id] as const,
 };
@@ -59,7 +63,10 @@ function injectClaimMutation<TVariables>(
     mutationFn: (variables: TVariables) => lastValueFrom(call(api, variables)),
     onSuccess: (claim: Claim) => {
       queryClient.setQueryData(claimKeys.detail(claim.id), claim);
-      return queryClient.invalidateQueries({ queryKey: claimKeys.lists() });
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: claimKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: claimKeys.team() }),
+      ]);
     },
   }));
 }

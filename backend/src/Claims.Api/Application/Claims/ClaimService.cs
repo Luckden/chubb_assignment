@@ -43,14 +43,15 @@ public sealed class ClaimService(
         (await LoadAsync(id, ct)).ToResponse();
 
     /// <summary>
-    /// UC-02 and UC-05: list claims, oldest first. A claimant filters by their own id; an officer filters by
-    /// assignee, status or unassigned claims.
+    /// UC-02 and UC-05: list claims, oldest first by submission or by time in current status (RFC-0003). A claimant
+    /// filters by their own id; an officer filters by assignee, status or unassigned claims.
     /// </summary>
     public async Task<IReadOnlyList<ClaimSummaryResponse>> ListAsync(
         Guid? claimantId,
         Guid? assigneeId,
         ClaimStatus? status,
         bool? unassigned,
+        ClaimListSort sort,
         CancellationToken ct)
     {
         var query = db.Claims.AsNoTracking().AsQueryable();
@@ -75,10 +76,22 @@ public sealed class ClaimService(
             query = query.Where(c => c.AssigneeId == null);
         }
 
+        // The status history is the only record of when the status changed (ADR-0014), so no column is added.
+        query = sort == ClaimListSort.StatusChangedAt
+            ? query.OrderBy(c => c.StatusHistory.Max(h => h.ChangedAt)).ThenBy(c => c.SubmittedAt)
+            : query.OrderBy(c => c.SubmittedAt);
+
         return await query
-            .OrderBy(c => c.SubmittedAt)
             .Select(c => new ClaimSummaryResponse(
-                c.Id, c.ClaimNumber, c.ClaimantId, c.AssigneeId, c.Type, c.Status, c.ClaimedAmount, c.SubmittedAt))
+                c.Id,
+                c.ClaimNumber,
+                c.ClaimantId,
+                c.AssigneeId,
+                c.Type,
+                c.Status,
+                c.ClaimedAmount,
+                c.SubmittedAt,
+                c.StatusHistory.Max(h => h.ChangedAt)))
             .ToListAsync(ct);
     }
 

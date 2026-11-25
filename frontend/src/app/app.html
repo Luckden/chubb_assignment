@@ -4,8 +4,20 @@
 
   <nav aria-label="Main" class="flex flex-1 gap-1">
     @if (currentUser.isOfficer()) {
-      <a mat-button routerLink="/work" routerLinkActive="active-link" ariaCurrentWhenActive="page"
+      <a
+        mat-button
+        routerLink="/work"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
         >Work queue</a
+      >
+      <a
+        mat-button
+        routerLink="/work/team"
+        routerLinkActive="active-link"
+        ariaCurrentWhenActive="page"
+        >Team</a
       >
     } @else {
       <a

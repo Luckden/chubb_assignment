@@ -18,6 +18,7 @@ function aClaim(overrides: Record<string, unknown> = {}) {
     decisionReason: null,
     decidedAt: null,
     submittedAt: '2026-11-21T09:00:00Z',
+    statusChangedAt: '2026-11-21T09:00:00Z',
     statusHistory: [
       {
         fromStatus: null,
@@ -32,7 +33,7 @@ function aClaim(overrides: Record<string, unknown> = {}) {
   };
 }
 
-/** A one-claim fake of /api/claims: list, get, submit and pick up. */
+/** A one-claim fake of /api/claims: list (with its filters), get, submit and pick up. */
 async function mockClaimsApi(page: Page, initial: ReturnType<typeof aClaim> | null) {
   let claim = initial;
   await page.route('**/api/system/info', (route) =>
@@ -45,10 +46,12 @@ async function mockClaimsApi(page: Page, initial: ReturnType<typeof aClaim> | nu
     if (request.method() === 'GET' && url.pathname === '/api/claims') {
       const unassigned = url.searchParams.get('unassigned') === 'true';
       const assigneeId = url.searchParams.get('assigneeId');
+      const status = url.searchParams.get('status');
       const matches =
         claim &&
         (!unassigned || claim.assigneeId === null) &&
-        (!assigneeId || claim.assigneeId === assigneeId);
+        (!assigneeId || claim.assigneeId === assigneeId) &&
+        (!status || claim.status === status);
       return route.fulfill({ json: matches ? [claim] : [] });
     }
     if (request.method() === 'POST' && url.pathname === '/api/claims') {
@@ -92,6 +95,7 @@ test.describe('claims (API mocked)', () => {
     await page.getByRole('option', { name: 'Carol Wong' }).click();
 
     await expect(page.getByRole('heading', { name: 'Work queue' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Unassigned (1)' }).click();
     await page.getByRole('link', { name: 'CLM-0001' }).click();
     await page.getByRole('button', { name: 'Pick up' }).click();
 

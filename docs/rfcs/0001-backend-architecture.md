@@ -127,7 +127,7 @@ Publishing an event after `SaveChanges` is added to this flow by RFC-0002.
 
 ## Rollout / implementation plan
 
-Steps 1 to 4 are done (74 tests pass). Step 5 waits for the officer-view decision (D6, drafted in RFC-0003) and step 6 for RFC-0002.
+Steps 1 to 4 are done (74 tests pass). Step 5 is done by RFC-0003 (`GET /api/workload`) and step 6 by RFC-0002.
 There is no authentication yet, so requests name the acting user and the service checks the role.
 
 1. Domain entities and `ClaimStatus` from design docs 3 and 4, with unit tests for the transition rules.

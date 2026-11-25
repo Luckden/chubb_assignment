@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List claims, oldest first. Filter by claimant, assignee, status, or unassigned claims. */
+        /**
+         * List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,
+         *     status, or unassigned claims.
+         */
         get: {
             parameters: {
                 query?: {
@@ -19,6 +22,7 @@ export interface paths {
                     assigneeId?: string;
                     status?: components["schemas"]["ClaimStatus"];
                     unassigned?: boolean;
+                    sort?: components["schemas"]["ClaimListSort"];
                 };
                 header?: never;
                 path?: never;
@@ -765,10 +769,136 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/workload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The acting officer's team: open work per officer and decisions in the last 30 days (R8). */
+        get: {
+            parameters: {
+                query?: {
+                    officerId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["WorkloadResponse"];
+                        "application/json": components["schemas"]["WorkloadResponse"];
+                        "text/json": components["schemas"]["WorkloadResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exposure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Claimed exposure: the claimed amount on claims not yet decided, an upper bound on liability (D7). */
+        get: {
+            parameters: {
+                query?: {
+                    officerId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ExposureResponse"];
+                        "application/json": components["schemas"]["ExposureResponse"];
+                        "text/json": components["schemas"]["ExposureResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ValidationProblemDetails"];
+                        "application/json": components["schemas"]["ValidationProblemDetails"];
+                        "text/json": components["schemas"]["ValidationProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** @enum {unknown} */
+        ClaimListSort: "SubmittedAt" | "StatusChangedAt" | null;
         /** @description R2: a claim with its history and information requests, so the claimant can track it. */
         ClaimResponse: {
             /** Format: uuid */
@@ -808,7 +938,10 @@ export interface components {
             changedAt: string;
             note: null | string;
         };
-        /** @description A row in a claim list: the claimant's own claims, or the officer's queue. */
+        /**
+         * @description A row in a claim list: the claimant's own claims, or the officer's queue. DateTimeOffset ClaimSummaryResponse.StatusChangedAt is when
+         *     the claim entered its current status (latest status history row), so the queue can show what is going stale.
+         */
         ClaimSummaryResponse: {
             /** Format: uuid */
             id: string;
@@ -823,11 +956,50 @@ export interface components {
             claimedAmount: number | string;
             /** Format: date-time */
             submittedAt: string;
+            /** Format: date-time */
+            statusChangedAt: string;
         };
         /** @enum {unknown} */
         ClaimType: "Motor" | "Property";
         /** @enum {unknown} */
         DecisionOutcome: "Settled" | "Rejected" | null;
+        /** @description Days since submission. Display buckets, not deadlines (ADR-0012). */
+        ExposureByAgeResponse: {
+            bucket: string;
+            /** Format: int32 */
+            count: number | string;
+            /** Format: double */
+            claimedAmount: number | string;
+        };
+        ExposureByStatusResponse: {
+            status: components["schemas"]["ClaimStatus"];
+            /** Format: int32 */
+            count: number | string;
+            /** Format: double */
+            claimedAmount: number | string;
+        };
+        ExposureByTypeResponse: {
+            type: components["schemas"]["ClaimType"];
+            /** Format: int32 */
+            count: number | string;
+            /** Format: double */
+            claimedAmount: number | string;
+        };
+        /**
+         * @description D7: claimed exposure, the sum of `claimed_amount` on claims not yet decided (ADR-0015). An upper bound on
+         *     what will be paid, not a reserve. Every status, type and age bucket is listed, with zeros where there is nothing.
+         */
+        ExposureResponse: {
+            /** Format: date-time */
+            asOf: string;
+            /** Format: int32 */
+            openClaims: number | string;
+            /** Format: double */
+            claimedExposure: number | string;
+            byStatus: components["schemas"]["ExposureByStatusResponse"][];
+            byType: components["schemas"]["ExposureByTypeResponse"][];
+            byAge: components["schemas"]["ExposureByAgeResponse"][];
+        };
         InformationRequestResponse: {
             /** Format: uuid */
             id: string;
@@ -855,6 +1027,29 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             readAt: null | string;
+        };
+        /**
+         * @description One officer's open work (workload) and decisions in the period (performance). The average runs from submission to
+         *     decision over the decisions in the period, and is null when there are none.
+         */
+        OfficerWorkloadResponse: {
+            /** Format: uuid */
+            officerId: string;
+            name: string;
+            /** Format: int32 */
+            underReview: number | string;
+            /** Format: int32 */
+            infoRequested: number | string;
+            /** Format: date-time */
+            oldestOpenStatusChangedAt: null | string;
+            /** Format: int32 */
+            decidedInPeriod: number | string;
+            /** Format: int32 */
+            settledInPeriod: number | string;
+            /** Format: int32 */
+            rejectedInPeriod: number | string;
+            /** Format: double */
+            averageDaysToDecision: null | number | string;
         };
         /** @description R5: an officer picks up a claim. */
         PickUpClaimRequest: {
@@ -910,6 +1105,13 @@ export interface components {
             environment: string;
             version: null | string;
         };
+        /** @description Claims nobody has picked up yet. A team-level figure: they belong to no officer. */
+        UnassignedWorkloadResponse: {
+            /** Format: int32 */
+            count: number | string;
+            /** Format: date-time */
+            oldestSubmittedAt: null | string;
+        };
         ValidationProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -920,6 +1122,16 @@ export interface components {
             errors?: {
                 [key: string]: string[];
             };
+        };
+        /** @description R8: the acting officer's team, its open work and its decisions in the last int WorkloadResponse.PeriodDays days. */
+        WorkloadResponse: {
+            teamId: null | string;
+            /** Format: date-time */
+            asOf: string;
+            /** Format: int32 */
+            periodDays: number | string;
+            unassigned: components["schemas"]["UnassignedWorkloadResponse"];
+            officers: components["schemas"]["OfficerWorkloadResponse"][];
         };
     };
     responses: never;

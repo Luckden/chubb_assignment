@@ -1,6 +1,6 @@
 # ADR-0014: Workload views are computed on read from the status history
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [RFC-0003](../rfcs/0003-officer-workload-and-liability-exposure.md), [ADR-0011](0011-minimal-claim-data-model.md), [ADR-0012](0012-claims-handling-rules-left-out.md), [Design doc 3](../design/03-erd.md)

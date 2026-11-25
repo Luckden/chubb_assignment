@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Claims.Api.Application.Claims;
+using Claims.Api.Application.Exposure;
 using Claims.Api.Application.Notifications;
+using Claims.Api.Application.Workload;
 using Claims.Api.Controllers;
 using Claims.Api.Infrastructure.Messaging;
 using Claims.Api.Infrastructure.Persistence;
@@ -25,6 +27,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>(includeInternalTyp
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<ClaimService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<WorkloadService>();
+builder.Services.AddScoped<ExposureService>();
 builder.Services.AddScoped<IEventHandler, ClaimantNotificationHandler>();
 
 // --- Messaging (Kafka) -----------------------------------------------------

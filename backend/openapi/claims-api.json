@@ -98,7 +98,7 @@
         "tags": [
           "Claims"
         ],
-        "summary": "List claims, oldest first. Filter by claimant, assignee, status, or unassigned claims.",
+        "summary": "List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,\r\nstatus, or unassigned claims.",
         "parameters": [
           {
             "name": "claimantId",
@@ -128,6 +128,13 @@
             "in": "query",
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ClaimListSort"
             }
           }
         ],
@@ -1148,10 +1155,177 @@
           }
         }
       }
+    },
+    "/api/workload": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "The acting officer's team: open work per officer and decisions in the last 30 days (R8).",
+        "parameters": [
+          {
+            "name": "officerId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkloadResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkloadResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkloadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exposure": {
+      "get": {
+        "tags": [
+          "Team"
+        ],
+        "summary": "Claimed exposure: the claimed amount on claims not yet decided, an upper bound on liability (D7).",
+        "parameters": [
+          {
+            "name": "officerId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExposureResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExposureResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExposureResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ClaimListSort": {
+        "enum": [
+          "SubmittedAt",
+          "StatusChangedAt",
+          null
+        ]
+      },
       "ClaimResponse": {
         "required": [
           "id",
@@ -1311,7 +1485,8 @@
           "type",
           "status",
           "claimedAmount",
-          "submittedAt"
+          "submittedAt",
+          "statusChangedAt"
         ],
         "type": "object",
         "properties": {
@@ -1350,9 +1525,13 @@
           "submittedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "statusChangedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
-        "description": "A row in a claim list: the claimant's own claims, or the officer's queue."
+        "description": "A row in a claim list: the claimant's own claims, or the officer's queue. DateTimeOffset ClaimSummaryResponse.StatusChangedAt is when\r\nthe claim entered its current status (latest status history row), so the queue can show what is going stale."
       },
       "ClaimType": {
         "enum": [
@@ -1366,6 +1545,146 @@
           "Rejected",
           null
         ]
+      },
+      "ExposureByAgeResponse": {
+        "required": [
+          "bucket",
+          "count",
+          "claimedAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "claimedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        },
+        "description": "Days since submission. Display buckets, not deadlines (ADR-0012)."
+      },
+      "ExposureByStatusResponse": {
+        "required": [
+          "status",
+          "count",
+          "claimedAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ClaimStatus"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "claimedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ExposureByTypeResponse": {
+        "required": [
+          "type",
+          "count",
+          "claimedAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ClaimType"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "claimedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ExposureResponse": {
+        "required": [
+          "asOf",
+          "openClaims",
+          "claimedExposure",
+          "byStatus",
+          "byType",
+          "byAge"
+        ],
+        "type": "object",
+        "properties": {
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "openClaims": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "claimedExposure": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "byStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExposureByStatusResponse"
+            }
+          },
+          "byType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExposureByTypeResponse"
+            }
+          },
+          "byAge": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExposureByAgeResponse"
+            }
+          }
+        },
+        "description": "D7: claimed exposure, the sum of `claimed_amount` on claims not yet decided (ADR-0015). An upper bound on\r\nwhat will be paid, not a reserve. Every status, type and age bucket is listed, with zeros where there is nothing."
       },
       "InformationRequestResponse": {
         "required": [
@@ -1454,6 +1773,86 @@
             "format": "date-time"
           }
         }
+      },
+      "OfficerWorkloadResponse": {
+        "required": [
+          "officerId",
+          "name",
+          "underReview",
+          "infoRequested",
+          "oldestOpenStatusChangedAt",
+          "decidedInPeriod",
+          "settledInPeriod",
+          "rejectedInPeriod",
+          "averageDaysToDecision"
+        ],
+        "type": "object",
+        "properties": {
+          "officerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "underReview": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "infoRequested": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "oldestOpenStatusChangedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "decidedInPeriod": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "settledInPeriod": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "rejectedInPeriod": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "averageDaysToDecision": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        },
+        "description": "One officer's open work (workload) and decisions in the period (performance). The average runs from submission to\r\ndecision over the decisions in the period, and is null when there are none."
       },
       "PickUpClaimRequest": {
         "required": [
@@ -1635,6 +2034,31 @@
         },
         "description": "Basic service information. Placeholder endpoint proving the API → OpenAPI → frontend chain."
       },
+      "UnassignedWorkloadResponse": {
+        "required": [
+          "count",
+          "oldestSubmittedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "oldestSubmittedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        },
+        "description": "Claims nobody has picked up yet. A team-level figure: they belong to no officer."
+      },
       "ValidationProblemDetails": {
         "type": "object",
         "properties": {
@@ -1681,6 +2105,46 @@
             }
           }
         }
+      },
+      "WorkloadResponse": {
+        "required": [
+          "teamId",
+          "asOf",
+          "periodDays",
+          "unassigned",
+          "officers"
+        ],
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "periodDays": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "unassigned": {
+            "$ref": "#/components/schemas/UnassignedWorkloadResponse"
+          },
+          "officers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfficerWorkloadResponse"
+            }
+          }
+        },
+        "description": "R8: the acting officer's team, its open work and its decisions in the last int WorkloadResponse.PeriodDays days."
       }
     }
   },
@@ -1693,6 +2157,9 @@
     },
     {
       "name": "System"
+    },
+    {
+      "name": "Team"
     }
   ]
 }

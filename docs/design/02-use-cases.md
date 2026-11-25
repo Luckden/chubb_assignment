@@ -5,7 +5,7 @@ Actors are the two user types in the brief's requirement paragraphs. Mermaid has
 a `flowchart` with actors on the outside and use cases inside the system boundary.
 
 **Status:** UC-01 to UC-07 are implemented in the API (see the [RTM](01-requirements-traceability-matrix.md) for endpoints
-and tests). UC-08 is not built: the workload and performance view is still undecided.
+and tests). UC-08 is built per RFC-0003: the staff Team page (`/work/team`) over `GET /api/workload`.
 
 ## Use case diagram
 

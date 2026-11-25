@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **Status** | Draft |
+| **Status** | Implemented |
 | **Author(s)** | |
 | **Created** | 2026-11-25 |
 | **Updated** | 2026-11-25 |
@@ -172,8 +172,8 @@ sort option, plus screens.
 1. **Claimed exposure overstates liability (decided: keep claimed exposure).** It is labelled as such, and the
    reserve is the "with more time" fix. Adding a reserve now was considered and not chosen: it would reverse ADR-0011
    and cost a field, validation, an endpoint and a screen.
-2. **Performance metrics are a choice, not a requirement.** R8 names "performance" without figures. Proposed:
-   decisions in 30 days, settled vs rejected, and average days to decision. Owner to confirm or change.
+2. **Performance metrics (decided: as proposed).** R8 names "performance" without figures. The owner confirmed
+   decisions in 30 days, settled vs rejected, and average days to decision.
 3. **Who sees exposure (decided: officers, no Manager role).** Officers see the whole book's exposure and their
    team's workload. Without a manager role, that is the nearest reading of the brief.
 4. Single currency is assumed. Six markets means this is wrong in reality; recorded, not solved (ADR-0011).
@@ -195,7 +195,9 @@ Steps 1–3 can be built before RFC-0002. Polling (section 4) arrives with RFC-0
 
 ## Outcome
 
-_Filled in when the RFC is closed._ Proposed ADRs:
-[ADR-0014](../adr/0014-workload-views-computed-on-read-from-status-history.md) (workload views computed on read from
-the status history) and [ADR-0015](../adr/0015-exposure-is-claimed-amount-on-open-claims.md) (exposure is the claimed
-amount on open claims).
+Implemented as proposed. [ADR-0014](../adr/0014-workload-views-computed-on-read-from-status-history.md) (workload
+views computed on read from the status history) and [ADR-0015](../adr/0015-exposure-is-claimed-amount-on-open-claims.md)
+(exposure is the claimed amount on open claims) are Accepted. Built: `statusChangedAt` and `sort` on
+`GET /api/claims`, `GET /api/workload`, `GET /api/exposure` (one `TeamController`), the three-tab queue with an
+"In status for" column, and the staff Team page (`/work/team`). The database filters and the figures are grouped in
+memory, which is fine at demo scale. Exposure tests use a `D7_` prefix (ADR-0020 amendment).

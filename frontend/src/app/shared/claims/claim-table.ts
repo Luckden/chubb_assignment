@@ -5,10 +5,14 @@ import { RouterLink } from '@angular/router';
 
 import type { ClaimSummary, ClaimType } from '../../core/api/api-types';
 import { CurrentUser } from '../../core/session/current-user';
+import { formatAge } from '../format-age';
 import { CLAIM_TYPE_LABELS } from './claim-labels';
 import { ClaimStatusChip } from './claim-status-chip';
 
-/** A list of claims; the claim number links to `<basePath>/<id>`. */
+/**
+ * A list of claims; the claim number links to `<basePath>/<id>`. With `showTimeInStatus`, an "In status for" column
+ * shows how long each claim has been in its current status (RFC-0003), measured at `asOf`.
+ */
 @Component({
   selector: 'app-claim-table',
   imports: [MatTableModule, RouterLink, DatePipe, DecimalPipe, ClaimStatusChip],
@@ -38,6 +42,10 @@ import { ClaimStatusChip } from './claim-status-chip';
           {{ claim.claimedAmount | number: '1.2-2' }}
         </td>
       </ng-container>
+      <ng-container matColumnDef="inStatusFor">
+        <th mat-header-cell *matHeaderCellDef scope="col">In status for</th>
+        <td mat-cell *matCellDef="let claim">{{ ages().get(claim.id) }}</td>
+      </ng-container>
       <ng-container matColumnDef="submittedAt">
         <th mat-header-cell *matHeaderCellDef scope="col">Submitted</th>
         <td mat-cell *matCellDef="let claim">{{ claim.submittedAt | date: 'mediumDate' }}</td>
@@ -55,6 +63,9 @@ export class ClaimTable {
   readonly basePath = input.required<string>();
   readonly label = input.required<string>();
   readonly showClaimant = input(false);
+  readonly showTimeInStatus = input(false);
+  /** When the data was fetched (query `dataUpdatedAt`), so ages move on with each poll. */
+  readonly asOf = input(0);
 
   protected readonly users = inject(CurrentUser);
   protected readonly typeLabel = (type: ClaimType) => CLAIM_TYPE_LABELS[type];
@@ -64,6 +75,11 @@ export class ClaimTable {
     'type',
     'status',
     'claimedAmount',
+    ...(this.showTimeInStatus() ? ['inStatusFor'] : []),
     'submittedAt',
   ]);
+  protected readonly ages = computed(() => {
+    const now = this.asOf() || Date.now();
+    return new Map(this.claims().map((c) => [c.id, formatAge(c.statusChangedAt, now)]));
+  });
 }

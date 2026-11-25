@@ -20,7 +20,10 @@ public class ClaimsController(ClaimService claims) : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = claim.Id }, claim);
     }
 
-    /// <summary>List claims, oldest first. Filter by claimant, assignee, status, or unassigned claims.</summary>
+    /// <summary>
+    /// List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,
+    /// status, or unassigned claims.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<ClaimSummaryResponse>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<ClaimSummaryResponse>>> List(
@@ -28,8 +31,9 @@ public class ClaimsController(ClaimService claims) : ControllerBase
         [FromQuery] Guid? assigneeId,
         [FromQuery] ClaimStatus? status,
         [FromQuery] bool? unassigned,
+        [FromQuery] ClaimListSort? sort,
         CancellationToken ct) =>
-        Ok(await claims.ListAsync(claimantId, assigneeId, status, unassigned, ct));
+        Ok(await claims.ListAsync(claimantId, assigneeId, status, unassigned, sort ?? ClaimListSort.SubmittedAt, ct));
 
     /// <summary>Track a claim (R2).</summary>
     [HttpGet("{id:guid}")]

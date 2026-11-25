@@ -237,3 +237,16 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** Whether 7 days is the right retention.
+
+### 2026-11-25: UI for the backend changes, and RFC-0003 built
+
+- **Asked:** To update the UI for the backend changes, check whether the API contract needed regenerating, and whether
+  new pages were needed for liability exposure and work efficiency, looking at RFC-0002 and RFC-0003.
+- **Accepted:**
+  - RFC-0002's UI was already done and the contract was current, so nothing changed there.
+  - RFC-0003's two open decisions: the performance figures (decisions in 30 days, settled vs rejected, average days
+    to decision) and ADR-0014 (workload computed on read from the status history).
+  - Building RFC-0003: workload and exposure endpoints, time in status on the claim list, a three-tab work queue and
+    a staff Team page.
+- **Challenged:** —
+- **Overrode:** —

@@ -47,7 +47,7 @@ here.
 | R5 | UC-05; Claim.assignee (ERD); Submitted to UnderReview | `GET /api/claims?unassigned=true`, `POST /api/claims/{id}/pick-up`; screens `/work`, `/work/{id}` | `R5_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec; claims e2e | Pass | Concurrent pick-up: one 200, one 409. |
 | R6 | UC-06; Information request (ERD); UnderReview, InfoRequested | `POST /api/claims/{id}/information-requests`; screen `/work/{id}` | `R6_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec | Pass | Assessing is a review activity; no stored amount. |
 | R7 | UC-07; Claim decision fields (ERD); UnderReview to Settled or Rejected | `POST /api/claims/{id}/settle`, `.../reject`; screen `/work/{id}` | `R7_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec | Pass |  |
-| R8 | UC-08; status history (ERD) | | | Not run | |
+| R8 | UC-08; status history (ERD); RFC-0003, ADR-0014 | `GET /api/workload`; `statusChangedAt` and `sort` on `GET /api/claims`; screens `/work` (queue tabs), `/work/team` | `R8_*` and `R5_ListClaims_*` in TeamViewsApiTests; WorkQueuePage and TeamPage specs; team e2e | Pass | Performance = decisions in 30 days, settled vs rejected, average days to decision (owner confirmed). Claimed exposure (D7, ADR-0015) is on the same screen: `GET /api/exposure`, `D7_*` tests. |
 
 Update this table as RFCs, code and tests land. If a requirement is dropped, mark it Won't in Priority and say why in
 Notes.

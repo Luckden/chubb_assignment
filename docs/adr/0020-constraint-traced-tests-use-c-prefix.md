@@ -20,6 +20,8 @@ would point at the wrong requirement.
 - A test that serves a requirement stays `R{n}_`. Event tests that exist to deliver a requirement (for example the
   notification for R3) use `R{n}_`.
 - The RTM lists `C{n}_*` tests in the Notes column of the requirement they support, if any.
+- Amendment (2026-11-25, RFC-0003): a test for a design question in `scope-and-prioritisation.md` that no
+  requirement covers is named `D{question}_...`, for example `D7_Exposure_ClaimSettled_RemovesItsClaimedAmount`.
 
 ## Consequences
 

@@ -29,10 +29,10 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0011](0011-minimal-claim-data-model.md) | Minimal claim data model | Accepted |
 | [0012](0012-claims-handling-rules-left-out.md) | Real-world claims handling rules are left out | Accepted |
 | [0013](0013-test-conventions-and-single-test-project.md) | Test conventions and a single test project | Accepted (amended by 0020) |
-| [0014](0014-workload-views-computed-on-read-from-status-history.md) | Workload views are computed on read from the status history | Proposed |
+| [0014](0014-workload-views-computed-on-read-from-status-history.md) | Workload views are computed on read from the status history | Accepted |
 | [0015](0015-exposure-is-claimed-amount-on-open-claims.md) | Liability exposure is the claimed amount on open claims | Accepted |
 | [0016](0016-rest-for-commands-kafka-for-lifecycle-events-via-outbox.md) | REST for commands and queries, Kafka for lifecycle events through a transactional outbox | Accepted |
 | [0017](0017-frontend-learns-of-changes-by-polling.md) | The frontend learns of changes by polling | Accepted |
 | [0018](0018-claimant-notifications-built-by-a-kafka-consumer.md) | Claimant notifications are built by a Kafka consumer | Accepted |
 | [0019](0019-snake-case-database-names.md) | Database tables and columns use snake_case | Accepted |
-| [0020](0020-constraint-traced-tests-use-c-prefix.md) | Tests for infrastructure constraints use a `C{n}_` prefix | Accepted |
+| [0020](0020-constraint-traced-tests-use-c-prefix.md) | Tests for infrastructure constraints use a `C{n}_` prefix | Accepted (amended: `D{n}_` for design questions) |

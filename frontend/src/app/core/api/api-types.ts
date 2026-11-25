@@ -17,6 +17,7 @@ export type ClaimSummary = Schemas['ClaimSummaryResponse'];
 export type ClaimStatusChange = Schemas['ClaimStatusChangeResponse'];
 export type InformationRequest = Schemas['InformationRequestResponse'];
 export type ClaimListFilter = NonNullable<paths['/api/claims']['get']['parameters']['query']>;
+export type ClaimListSort = NonNullable<Schemas['ClaimListSort']>;
 
 export type SubmitClaimRequest = Schemas['SubmitClaimRequest'];
 export type PickUpClaimRequest = Schemas['PickUpClaimRequest'];
@@ -30,3 +31,7 @@ export type ValidationProblemDetails = Schemas['ValidationProblemDetails'];
 
 export type Notification = Schemas['NotificationResponse'];
 export type MarkNotificationReadRequest = Schemas['MarkNotificationReadRequest'];
+
+export type Workload = Schemas['WorkloadResponse'];
+export type OfficerWorkload = Schemas['OfficerWorkloadResponse'];
+export type Exposure = Schemas['ExposureResponse'];

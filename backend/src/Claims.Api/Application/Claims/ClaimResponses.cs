@@ -2,7 +2,10 @@ using Claims.Api.Domain;
 
 namespace Claims.Api.Application.Claims;
 
-/// <summary>A row in a claim list: the claimant's own claims, or the officer's queue.</summary>
+/// <summary>
+/// A row in a claim list: the claimant's own claims, or the officer's queue. <see cref="StatusChangedAt"/> is when
+/// the claim entered its current status (latest status history row), so the queue can show what is going stale.
+/// </summary>
 public sealed record ClaimSummaryResponse(
     Guid Id,
     string ClaimNumber,
@@ -11,7 +14,15 @@ public sealed record ClaimSummaryResponse(
     ClaimType Type,
     ClaimStatus Status,
     decimal ClaimedAmount,
-    DateTimeOffset SubmittedAt);
+    DateTimeOffset SubmittedAt,
+    DateTimeOffset StatusChangedAt);
+
+/// <summary>Order of a claim list. Both are oldest first.</summary>
+public enum ClaimListSort
+{
+    SubmittedAt,
+    StatusChangedAt,
+}
 
 /// <summary>R2: a claim with its history and information requests, so the claimant can track it.</summary>
 public sealed record ClaimResponse(
