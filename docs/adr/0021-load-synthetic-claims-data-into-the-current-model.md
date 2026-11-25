@@ -33,12 +33,13 @@ We will load the data through an opt-in seeder, `SampleDataSeeder`, mapping it o
 - **Events:** loading goes through `Claim.Restore`, which checks no lifecycle rules and raises no events. The facts
   predate the system, so nothing reaches the outbox, Kafka or the notifications table.
 - **Switch:** `Database:SeedSampleData`, on in `appsettings.Development.json` (so Docker Compose and `dotnet run`).
-  Loading skips rows already present. Integration tests use the Testing environment, which leaves it off.
+  Startup keeps two claims of each status, not the whole file. A database that already has the full file is trimmed
+  to that sample. Integration tests use the Testing environment, which leaves the switch off.
 
 ## Consequences
 
-- The work queue, workload and exposure views have realistic volume. Open exposure is about USD 1.68M, close to the
-  data set's own figure of USD 1.6M, which also counts reserves.
+- Startup does not load the whole file. Acting as stays the four demo users plus SampleClaimant and Sample Staff,
+  with two claims of each status.
 - The mapping loses information: a reopened claim has lost its "reopened" marker, and the deductible and sum insured
   checks the data set was designed for (`edge_cases.csv`) cannot be exercised.
 - Acting as keeps Alice, Bob, Carol and Dave, and adds SampleClaimant and Sample Staff. A sample claim names one of

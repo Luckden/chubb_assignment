@@ -26,6 +26,19 @@ public class SampleDataTests
             c => c.Status == ClaimStatus.Rejected && c.AssigneeId == DemoUsers.SampleStaff);
     }
 
+    [Fact]
+    public void D7_ClaimsToSeed_TwoOfEachStatus_ForTheDemoUsersAndSampleUsers()
+    {
+        var sample = SampleDataSeeder.ClaimsToSeed(Data.Claims);
+
+        Assert.Equal(SampleDataSeeder.PerStatus * Enum.GetValues<ClaimStatus>().Length, sample.Count);
+        Assert.All(Enum.GetValues<ClaimStatus>(), status =>
+            Assert.Equal(SampleDataSeeder.PerStatus, sample.Count(c => c.Status == status)));
+        Assert.All(sample, c => Assert.Equal(DemoUsers.SampleClaimant, c.ClaimantId));
+        Assert.All(sample.Where(c => c.Status == ClaimStatus.Submitted), c => Assert.Null(c.AssigneeId));
+        Assert.All(sample.Where(c => c.Status != ClaimStatus.Submitted), c => Assert.Equal(DemoUsers.SampleStaff, c.AssigneeId));
+    }
+
     [Theory]
     [InlineData("SUBMITTED", ClaimStatus.Submitted)]
     [InlineData("ASSIGNED", ClaimStatus.UnderReview)]

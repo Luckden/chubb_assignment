@@ -313,3 +313,11 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** —
+
+### 2026-11-25: Main users and a short sample
+
+- **Asked:** The data change was removal of the huge list, with sample users: the main users and some samples.
+- **Accepted:** —
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** —

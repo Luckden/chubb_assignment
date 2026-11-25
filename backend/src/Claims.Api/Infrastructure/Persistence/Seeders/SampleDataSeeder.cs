@@ -4,15 +4,26 @@ using Microsoft.EntityFrameworkCore;
 namespace Claims.Api.Infrastructure.Persistence.Seeders;
 
 /// <summary>
-/// Loads the synthetic APAC claims data (ADR-0021) when <c>Database:SeedSampleData</c> is on: about 1,400 claims with
-/// their history and information requests. Every sample claimant is <see cref="DemoUsers.SampleClaimant"/> and every
-/// sample officer is <see cref="DemoUsers.SampleStaff"/>, so a rejected claim still names who handled it. Rows already
-/// present are skipped, and an earlier load that used one user per source person is folded onto these two. It writes
-/// no outbox events, because these facts predate the system.
+/// Loads a short sample of the synthetic claims (ADR-0021) when <c>Database:SeedSampleData</c> is on: two claims in
+/// each status, all filed by <see cref="DemoUsers.SampleClaimant"/> and handled by <see cref="DemoUsers.SampleStaff"/>.
+/// The four demo users stay as themselves. A database that already has the full file is trimmed back to this sample.
+/// It writes no outbox events, because these facts predate the system.
 /// </summary>
 public sealed class SampleDataSeeder(IConfiguration configuration, ILogger<SampleDataSeeder> logger) : IDataSeeder
 {
-    private const int BatchSize = 200;
+    /// <summary>How many claims of each status a fresh database receives.</summary>
+    public const int PerStatus = 2;
+
+    public static IReadOnlyList<Claim> ClaimsToSeed(IReadOnlyList<Claim> claims) =>
+        Enum.GetValues<ClaimStatus>().SelectMany(status =>
+        {
+            var ofStatus = claims.Where(c => c.Status == status);
+            var preferred = status == ClaimStatus.Submitted
+                ? ofStatus.Where(c => c.AssigneeId is null)
+                : ofStatus.Where(c => c.AssigneeId is not null);
+            var picked = preferred.Take(PerStatus).ToList();
+            return picked.Count == PerStatus ? picked : ofStatus.Take(PerStatus);
+        }).ToList();
 
     public async Task SeedAsync(ClaimsDbContext db, CancellationToken cancellationToken)
     {
@@ -23,25 +34,32 @@ public sealed class SampleDataSeeder(IConfiguration configuration, ILogger<Sampl
         }
 
         var data = SampleDataLoader.Load();
+        var sample = ClaimsToSeed(data.Claims);
+        var sampleIds = sample.Select(c => c.Id).ToHashSet();
 
         var existingUsers = (await db.Users.Select(u => u.Id).ToListAsync(cancellationToken)).ToHashSet();
         db.Users.AddRange(data.Users.Where(u => !existingUsers.Contains(u.Id)));
         await db.SaveChangesAsync(cancellationToken);
 
+        var removed = await db.Claims
+            .Where(c => c.ClaimantId == DemoUsers.SampleClaimant && !sampleIds.Contains(c.Id))
+            .ExecuteDeleteAsync(cancellationToken);
+
         var existingClaims = (await db.Claims.Select(c => c.Id).ToListAsync(cancellationToken)).ToHashSet();
-        var missing = data.Claims.Where(c => !existingClaims.Contains(c.Id)).ToList();
-        foreach (var batch in missing.Chunk(BatchSize))
+        var missing = sample.Where(c => !existingClaims.Contains(c.Id)).ToList();
+        if (missing.Count > 0)
         {
-            db.Claims.AddRange(batch);
+            db.Claims.AddRange(missing);
             await db.SaveChangesAsync(cancellationToken);
             db.ChangeTracker.Clear();
         }
 
         var folded = await FoldLegacySampleUsersAsync(db, cancellationToken);
         logger.LogInformation(
-            "Sample data: {Claims} claims added, {Skipped} already present, {Folded} earlier sample users folded onto SampleClaimant and Sample Staff",
+            "Sample data: {Claims} claims kept ({Added} added, {Removed} removed), {Folded} earlier sample users folded onto SampleClaimant and Sample Staff",
+            sample.Count,
             missing.Count,
-            data.Claims.Count - missing.Count,
+            removed,
             folded);
     }
 

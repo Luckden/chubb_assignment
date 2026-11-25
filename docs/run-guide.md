@@ -42,9 +42,10 @@ docker compose up --build -d
 
 The first run downloads images and builds the API and SPA: allow **5–10 minutes**. Later runs take seconds.
 
-On startup the API creates the database schema, seeds the demo users and about 1,400 synthetic claims
-([ADR-0021](adr/0021-load-synthetic-claims-data-into-the-current-model.md)), and creates its Kafka topics. Set
-`Database__SeedSampleData: false` on the `api` service to skip the claims. Check that it is ready:
+On startup the API creates the database schema, seeds the demo users and a short sample of claims
+([ADR-0021](adr/0021-load-synthetic-claims-data-into-the-current-model.md)), and creates its Kafka topics. The
+sample is two claims in each status, under SampleClaimant and Sample Staff. Set `Database__SeedSampleData: false`
+on the `api` service to skip those claims. Check that it is ready:
 
 ```bash
 docker compose ps                         # api, web, postgres, kafka, kafka-ui: running (postgres, kafka: healthy)

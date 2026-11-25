@@ -83,8 +83,9 @@ Changes made as one user show up for the other within 10 seconds, without a relo
 ## Try the API
 
 There is no authentication yet. Each request names the acting user, and the API checks that the user exists and has
-the right role. Demo users are seeded on startup (Development and tests). In Development, about 1,400
-synthetic claims load as SampleClaimant and Sample Staff ([ADR-0021](docs/adr/0021-load-synthetic-claims-data-into-the-current-model.md)):
+the right role. Demo users are seeded on startup (Development and tests). In Development a short sample is
+loaded too: two claims in each status, filed by SampleClaimant and handled by Sample Staff
+([ADR-0021](docs/adr/0021-load-synthetic-claims-data-into-the-current-model.md)):
 
 | User | Role | Id |
 | --- | --- | --- |
