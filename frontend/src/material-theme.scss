@@ -1,0 +1,31 @@
+// Angular Material 3 theme. Sass is used only here (Material's theming API is Sass);
+// all other styles are plain CSS so Tailwind 4 can process them (see styles.css).
+@use '@angular/material' as mat;
+
+html {
+  // Light by default, dark when the OS prefers it.
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+}

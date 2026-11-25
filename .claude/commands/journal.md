@@ -3,8 +3,13 @@ description: Append an entry to the AI working journal
 argument-hint: [topic]
 ---
 
-Append an entry to `docs/ai-journal.md` for the work in this session (topic: "$ARGUMENTS").
+Draft an entry for `docs/ai-journal.md` covering this session's work (topic: "$ARGUMENTS").
 
-Use the entry template in that file. Record factually what I asked for, what was accepted, and anything you or I
-challenged or overrode, with the reason. Leave `My notes` as a TODO for me. Do not invent my opinions.
-Show me the entry before saving it.
+Follow the rules in the "AI journal" section of `AGENTS.md`:
+
+- Use the file's entry template.
+- Write in my voice, and only record what I actually asked, accepted, challenged or overrode. Use "—" where there was nothing.
+- Leave out the AI's own fixes, and keep it short and high level.
+- Leave `My notes` as `_TODO_`.
+
+Show me the draft before saving it.

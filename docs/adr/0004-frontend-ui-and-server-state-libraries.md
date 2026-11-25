@@ -1,6 +1,6 @@
 # ADR-0004: Frontend UI and server-state libraries
 
-- **Status:** Proposed
+- **Status:** Superseded by [ADR-0005](0005-use-angular-material-for-ui-components.md)
 - **Date:** 2026-11-25
 - **Deciders:** Project owner
 - **Related:** [ADR-0002](0002-baseline-technology-stack.md), [ADR-0003](0003-engineering-guardrails-for-ai-assisted-development.md)

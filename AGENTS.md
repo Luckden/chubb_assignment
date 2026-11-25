@@ -43,16 +43,23 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
 - **Messaging:** publish through `IEventPublisher`; topic names live in `Infrastructure/Messaging/Topics.cs`.
   Events are past-tense facts (`ClaimSubmitted`), keyed by aggregate id.
 - **Frontend:** follow `frontend/AGENTS.md` (standalone, signals, OnPush, `inject()`, native control flow).
-  - **Styling:** Tailwind CSS 4 + daisyUI 5, plain CSS (no SCSS; Tailwind 4 doesn't support Sass). Use daisyUI
-    component classes first, then Tailwind utilities, and write custom CSS last. Rules and the component reference are in
-    `.claude/skills/daisyui/SKILL.md`. No `tailwind.config.js`: configure in `src/styles.css`. Use semantic colours
-    (`bg-primary`, `text-base-content`), not raw palette colours, so themes keep working.
-  - **Behaviour:** daisyUI is CSS only. For dialogs, menus, overlays, focus traps and sortable tables, use `@angular/cdk`.
+  - **Components:** Angular Material 21 (Material 3). Use Material components (`mat-toolbar`, `mat-table`,
+    `mat-form-field`, `mat-dialog`, ...) before building your own. Import each component's module or directive
+    into the standalone component that uses it. Use the Angular CLI MCP for Material docs and examples.
+  - **Theme:** `src/material-theme.scss` is the only Sass file (Material's theming API is Sass). Change colours,
+    typography and density there with `mat.theme`; to restyle one component, use the `mat.<component>-overrides`
+    mixins, not CSS selectors that target Material internals.
+  - **Layout:** Tailwind CSS 4 utilities for layout and spacing only (`flex`, `grid`, `gap-*`, `p-*`). Configure it in
+    `src/styles.css`; there is no `tailwind.config.js`. Colours come from Material's system tokens, mapped to
+    Tailwind there (`bg-surface-container`, `text-on-surface-variant`, `bg-primary-container`). Never use raw
+    palette colours (`bg-blue-500`), so light and dark themes keep working.
+  - **Behaviour:** for anything Material lacks (custom overlays, drag and drop, focus traps), use `@angular/cdk`.
   - **Server state:** TanStack Query (`@tanstack/angular-query`). Each API area gets a `core/api/<area>.queries.ts`
     with a key factory and `inject*Query()` / `inject*Mutation()` helpers (see `system.queries.ts`). Call `inject()`
     *outside* the `injectQuery` callback. After a mutation, invalidate the affected keys. Don't copy server data into
     signals or services; local UI state goes in signals.
-  - **Icons:** `lucide-angular` (`LucideAngularModule`, `<lucide-icon [img]="Icon" />`), decorative icons with `aria-hidden`.
+  - **Icons:** `<mat-icon>name</mat-icon>` with Material Symbols (Outlined, set as the default font in
+    `app.config.ts`). Mark decorative icons `aria-hidden="true"`.
   - **Unit tests with queries:** provide `provideTanStackQuery(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }))`.
     Call `fixture.detectChanges()`, flush `HttpTestingController`, *then* `await fixture.whenStable()`. An in-flight
     query counts as pending, so awaiting first deadlocks.
@@ -70,5 +77,11 @@ Claims platform take-home: Angular SPA + .NET API + PostgreSQL + Kafka. Backend 
 
 ## AI journal
 
-The brief requires `docs/ai-journal.md`. When you finish a meaningful chunk of work, propose a journal entry
-(asked / accepted / challenged / overrode / why). Do not invent the human's opinions; leave `My notes` for them.
+The brief requires `docs/ai-journal.md`. It is the human's log, written in their voice. When you finish a
+meaningful chunk of work, propose a short entry in the file's template:
+
+- Record only what the human actually asked, accepted, challenged or overrode. Use "—" when they didn't challenge
+  or override anything.
+- Leave the AI's own fixes and self-corrections out. They are not the human's challenges.
+- Keep entries brief and high level: decisions, not implementation detail.
+- Never invent the human's opinions; leave `My notes` for them.
