@@ -32,7 +32,7 @@ EF Core is configured.
 
 ## Consequences
 
-- Rules live in one place and are unit-testable without a database (15 domain tests).
+- Rules live in one place and are unit-testable without a database.
 - `Application` depends on EF Core. That is accepted; only `Domain` is kept free of it.
 - A row version sits on a domain entity, a small persistence concern in `Domain`.
 - Tests that need the database run against real PostgreSQL (Testcontainers), including a concurrent pick-up test.

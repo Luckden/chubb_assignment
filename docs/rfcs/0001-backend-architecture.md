@@ -127,7 +127,7 @@ Publishing an event after `SaveChanges` is added to this flow by RFC-0002.
 
 ## Rollout / implementation plan
 
-Steps 1 to 4 are done (32 tests pass). Step 5 waits for the officer-view decision (D6) and step 6 for RFC-0002.
+Steps 1 to 4 are done (74 tests pass). Step 5 waits for the officer-view decision (D6) and step 6 for RFC-0002.
 There is no authentication yet, so requests name the acting user and the service checks the role.
 
 1. Domain entities and `ClaimStatus` from design docs 3 and 4, with unit tests for the transition rules.
@@ -140,6 +140,6 @@ There is no authentication yet, so requests name the acting user and the service
 
 ## Outcome
 
-Accepted as proposed. Steps 1 to 4 are implemented and tested (32 tests, including a concurrent pick-up test against
+Accepted as proposed. Steps 1 to 4 are implemented and tested (74 tests, including a concurrent pick-up test against
 real PostgreSQL). Resulting ADRs: [ADR-0006](../adr/0006-backend-layered-structure.md) (structure) and
 [ADR-0007](../adr/0007-application-services-and-ef-core-conventions.md) (services, domain and EF Core conventions).

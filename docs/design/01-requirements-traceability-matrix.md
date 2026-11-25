@@ -14,8 +14,8 @@ here.
 
 **Traceability in both directions**
 - **Forward:** requirement → design (RFC/ADR) → implementation (endpoint, event) → test case.
-- **Backward:** every test case is named with its requirement ID (e.g. `R6_Officer_can_assess_claim`, test case ID
-  `T-R6-01`), so any test traces back to a requirement. A test with no requirement ID is out of scope.
+- **Backward:** every test case is named with its requirement ID (`R{id}_{Method}_{Scenario}_{ExpectedBehavior}`, e.g.
+  `R6_RequestInformation_OtherOfficer_ThrowsNotPermitted`, following the .NET unit testing naming guidance), so any test traces back to a requirement. A test with no requirement ID is out of scope.
 
 **Column key**
 - **Priority:** Must / Should / Won't. Left blank on purpose: scope decisions are mine.
@@ -40,13 +40,13 @@ here.
 
 | Req ID | Design | Implementation | Test case ID | Test status | Notes |
 | --- | --- | --- | --- | --- | --- |
-| R1 | UC-01; Claim (ERD); Submitted (lifecycle) | `POST /api/claims`; `Claim.Submit` | `R1_*` in ClaimTests, ClaimsApiTests | Pass |  |
-| R2 | UC-02; Claim, status history (ERD) | `GET /api/claims`, `GET /api/claims/{id}` | `R2_*`, `R1_..._R2` in ClaimsApiTests | Pass |  |
-| R3 | UC-03; Information request (ERD); InfoRequested to UnderReview | `POST /api/claims/{id}/information-response` | `R3_*` in ClaimTests, ClaimsApiTests | Pass |  |
-| R4 | UC-04; Claim decision fields (ERD); Settled, Rejected | Decision fields on `GET /api/claims/{id}` | `R7_..._R4` in ClaimsApiTests | Pass | Claimant sees the decision by tracking. No notification yet (RFC-0002). |
-| R5 | UC-05; Claim.assignee (ERD); Submitted to UnderReview | `GET /api/claims?unassigned=true`, `POST /api/claims/{id}/pick-up` | `R5_*` in ClaimTests, ClaimsApiTests | Pass | Concurrent pick-up: one 200, one 409. |
-| R6 | UC-06; Information request (ERD); UnderReview, InfoRequested | `POST /api/claims/{id}/information-requests` | `R6_*` in ClaimTests, ClaimsApiTests | Pass | Assessing is a review activity; no stored amount. |
-| R7 | UC-07; Claim decision fields (ERD); UnderReview to Settled or Rejected | `POST /api/claims/{id}/settle`, `.../reject` | `R7_*` in ClaimTests, ClaimsApiTests | Pass |  |
+| R1 | UC-01; Claim (ERD); Submitted (lifecycle) | `POST /api/claims`; `Claim.Submit`; screen `/my-claims/new` | `R1_*` in ClaimTests, ClaimsApiTests; ReportIncidentPage spec; claims e2e | Pass |  |
+| R2 | UC-02; Claim, status history (ERD) | `GET /api/claims`, `GET /api/claims/{id}`; screens `/my-claims`, `/my-claims/{id}` | `R2_*` in ClaimTests, ClaimsApiTests; ClaimantClaimPage spec | Pass |  |
+| R3 | UC-03; Information request (ERD); InfoRequested to UnderReview | `POST /api/claims/{id}/information-response`; screen `/my-claims/{id}` | `R3_*` in ClaimTests, ClaimsApiTests; ClaimantClaimPage spec | Pass |  |
+| R4 | UC-04; Claim decision fields (ERD); Settled, Rejected | Decision fields on `GET /api/claims/{id}`; screen `/my-claims/{id}` | `R4_*` in ClaimsApiTests; ClaimantClaimPage spec | Pass | Claimant sees the decision by tracking. No notification yet (RFC-0002). |
+| R5 | UC-05; Claim.assignee (ERD); Submitted to UnderReview | `GET /api/claims?unassigned=true`, `POST /api/claims/{id}/pick-up`; screens `/work`, `/work/{id}` | `R5_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec; claims e2e | Pass | Concurrent pick-up: one 200, one 409. |
+| R6 | UC-06; Information request (ERD); UnderReview, InfoRequested | `POST /api/claims/{id}/information-requests`; screen `/work/{id}` | `R6_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec | Pass | Assessing is a review activity; no stored amount. |
+| R7 | UC-07; Claim decision fields (ERD); UnderReview to Settled or Rejected | `POST /api/claims/{id}/settle`, `.../reject`; screen `/work/{id}` | `R7_*` in ClaimTests, ClaimsApiTests; StaffClaimPage spec | Pass |  |
 | R8 | UC-08; status history (ERD) | | | Not run | |
 
 Update this table as RFCs, code and tests land. If a requirement is dropped, mark it Won't in Priority and say why in
