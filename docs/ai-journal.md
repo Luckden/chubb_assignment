@@ -321,3 +321,13 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** —
+
+### 2026-11-25: AI usage overview for submission
+
+- **Asked:** A document built from the journal, RFCs, ADRs and other docs, with sections on how I used AI, because AI
+  decisions are spread across those documents.
+- **Accepted:** `docs/ai-usage-and-decisions.md`: how I worked, where each kind of decision is recorded, guardrails,
+  where I challenged and overrode the AI, what I left out, and the limits.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** ADR-0021 still describes the earlier SampleClaimant seeding, which later commits changed.
