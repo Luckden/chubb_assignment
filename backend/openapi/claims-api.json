@@ -98,7 +98,7 @@
         "tags": [
           "Claims"
         ],
-        "summary": "List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,\r\nstatus, or unassigned claims still waiting to be picked up.",
+        "summary": "List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,\nstatus, or unassigned claims still waiting to be picked up.",
         "parameters": [
           {
             "name": "claimantId",
@@ -1531,7 +1531,7 @@
             "format": "date-time"
           }
         },
-        "description": "A row in a claim list: the claimant's own claims, or the officer's queue. DateTimeOffset ClaimSummaryResponse.StatusChangedAt is when\r\nthe claim entered its current status (latest status history row), so the queue can show what is going stale."
+        "description": "A row in a claim list: the claimant's own claims, or the officer's queue. DateTimeOffset ClaimSummaryResponse.StatusChangedAt is when\nthe claim entered its current status (latest status history row), so the queue can show what is going stale."
       },
       "ClaimType": {
         "enum": [
@@ -1684,7 +1684,7 @@
             }
           }
         },
-        "description": "D7: claimed exposure, the sum of `claimed_amount` on claims not yet decided (ADR-0015). An upper bound on\r\nwhat will be paid, not a reserve. Every status, type and age bucket is listed, with zeros where there is nothing."
+        "description": "D7: claimed exposure, the sum of `claimed_amount` on claims not yet decided (ADR-0015). An upper bound on\nwhat will be paid, not a reserve. Every status, type and age bucket is listed, with zeros where there is nothing."
       },
       "InformationRequestResponse": {
         "required": [
@@ -1852,7 +1852,7 @@
             "format": "double"
           }
         },
-        "description": "One officer's open work (workload) and decisions in the period (performance). The average runs from submission to\r\ndecision over the decisions in the period, and is null when there are none."
+        "description": "One officer's open work (workload) and decisions in the period (performance). The average runs from submission to\ndecision over the decisions in the period, and is null when there are none."
       },
       "PickUpClaimRequest": {
         "required": [
