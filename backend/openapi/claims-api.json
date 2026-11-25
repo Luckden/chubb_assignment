@@ -1064,7 +1064,13 @@
         "description": "R2: a claim with its history and information requests, so the claimant can track it."
       },
       "ClaimStatus": {
-        "type": "integer",
+        "enum": [
+          "Submitted",
+          "UnderReview",
+          "InfoRequested",
+          "Settled",
+          "Rejected"
+        ],
         "description": "Lifecycle of a claim. Allowed transitions are documented in docs/design/04-claim-lifecycle.md."
       },
       "ClaimStatusChangeResponse": {
@@ -1159,10 +1165,17 @@
         "description": "A row in a claim list: the claimant's own claims, or the officer's queue."
       },
       "ClaimType": {
-        "type": "integer"
+        "enum": [
+          "Motor",
+          "Property"
+        ]
       },
       "DecisionOutcome": {
-        "type": "integer"
+        "enum": [
+          "Settled",
+          "Rejected",
+          null
+        ]
       },
       "InformationRequestResponse": {
         "required": [

@@ -31,6 +31,9 @@ builder.Services.AddKafkaMessaging(builder.Configuration);
 // Enums travel as strings (readable JSON and a readable OpenAPI schema).
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+// The OpenAPI generator reads the HTTP JSON options, not the MVC ones above: without this the schema says integer.
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();

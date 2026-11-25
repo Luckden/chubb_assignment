@@ -9,10 +9,22 @@ using Claims.Api.Tests.Infrastructure;
 
 namespace Claims.Api.Tests;
 
-/// <summary>The Must slice end to end against real PostgreSQL (Testcontainers). Test names carry the RTM requirement id.</summary>
+/// <summary>
+/// Integration tests: the Must slice end to end against real PostgreSQL (Testcontainers). Requires Docker.
+/// Names follow R{requirement}_{Action}_{Scenario}_{ExpectedBehavior}. Arrange steps go through helpers, so each
+/// test has one act.
+/// </summary>
 [Collection(ApiCollection.Name)]
 public class ClaimsApiTests(ClaimsApiFactory factory)
 {
+    private const string Description = "description";
+    private const string Question = "question";
+    private const string Answer = "answer";
+    private const string Reason = "reason";
+    private const decimal Amount = 1m;
+
+    private static readonly DateOnly IncidentDate = new(2026, 11, 20);
+
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
         Converters = { new JsonStringEnumConverter() },
@@ -20,47 +32,76 @@ public class ClaimsApiTests(ClaimsApiFactory factory)
 
     private readonly HttpClient _client = factory.CreateClient();
 
-    private async Task<ClaimResponse> SubmitAsync(Guid? claimantId = null)
+    // --- Arrange and act helpers ---------------------------------------------------------------
+
+    private static async Task<T> ReadAsync<T>(HttpResponseMessage response, HttpStatusCode expected = HttpStatusCode.OK)
     {
-        var response = await _client.PostAsJsonAsync(
-            "/api/claims",
-            new SubmitClaimRequest(claimantId ?? DemoUsers.Alice, ClaimType.Motor, new DateOnly(2026, 11, 20), "Rear-ended at a junction", 1200m),
-            Json);
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        return (await response.Content.ReadFromJsonAsync<ClaimResponse>(Json))!;
+        Assert.Equal(expected, response.StatusCode);
+        return (await response.Content.ReadFromJsonAsync<T>(Json))!;
     }
 
-    private async Task<HttpResponseMessage> PostAsync(Guid claimId, string action, object body) =>
-        await _client.PostAsJsonAsync($"/api/claims/{claimId}/{action}", body, Json);
+    private static int IndexOf(List<ClaimSummaryResponse> claims, Guid id) => claims.FindIndex(c => c.Id == id);
 
-    private async Task<ClaimResponse> ReadAsync(HttpResponseMessage response)
+    private Task<HttpResponseMessage> PostAsync(string path, object body) => _client.PostAsJsonAsync(path, body, Json);
+
+    private Task<HttpResponseMessage> SubmitRequestAsync(Guid claimantId, string description = Description, decimal amount = Amount) =>
+        PostAsync("/api/claims", new SubmitClaimRequest(claimantId, ClaimType.Motor, IncidentDate, description, amount));
+
+    private Task<HttpResponseMessage> PickUpRequestAsync(Guid claimId, Guid officerId) =>
+        PostAsync($"/api/claims/{claimId}/pick-up", new PickUpClaimRequest(officerId));
+
+    private Task<HttpResponseMessage> AskRequestAsync(Guid claimId, Guid officerId) =>
+        PostAsync($"/api/claims/{claimId}/information-requests", new RequestInformationRequest(officerId, Question));
+
+    private Task<HttpResponseMessage> AnswerRequestAsync(Guid claimId, Guid claimantId) =>
+        PostAsync($"/api/claims/{claimId}/information-response", new ProvideInformationRequest(claimantId, Answer));
+
+    private Task<HttpResponseMessage> SettleRequestAsync(Guid claimId, Guid officerId) =>
+        PostAsync($"/api/claims/{claimId}/settle", new SettleClaimRequest(officerId, Reason));
+
+    private Task<HttpResponseMessage> RejectRequestAsync(Guid claimId, Guid officerId, string reason = Reason) =>
+        PostAsync($"/api/claims/{claimId}/reject", new RejectClaimRequest(officerId, reason));
+
+    private async Task<ClaimResponse> SubmittedAsync(Guid? claimantId = null) =>
+        await ReadAsync<ClaimResponse>(await SubmitRequestAsync(claimantId ?? DemoUsers.Alice), HttpStatusCode.Created);
+
+    private async Task<ClaimResponse> UnderReviewAsync()
     {
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return (await response.Content.ReadFromJsonAsync<ClaimResponse>(Json))!;
+        var claim = await SubmittedAsync();
+        return await ReadAsync<ClaimResponse>(await PickUpRequestAsync(claim.Id, DemoUsers.Carol));
+    }
+
+    private async Task<ClaimResponse> InfoRequestedAsync()
+    {
+        var claim = await UnderReviewAsync();
+        return await ReadAsync<ClaimResponse>(await AskRequestAsync(claim.Id, DemoUsers.Carol));
+    }
+
+    private async Task<ClaimResponse> SettledAsync()
+    {
+        var claim = await UnderReviewAsync();
+        return await ReadAsync<ClaimResponse>(await SettleRequestAsync(claim.Id, DemoUsers.Carol));
+    }
+
+    private async Task<List<ClaimSummaryResponse>> ListAsync(string query = "") =>
+        (await _client.GetFromJsonAsync<List<ClaimSummaryResponse>>($"/api/claims{query}", Json))!;
+
+    // --- R1: report an incident ----------------------------------------------------------------
+
+    [Fact]
+    public async Task R1_Submit_ValidReport_ReturnsCreatedSubmittedClaim()
+    {
+        var response = await SubmitRequestAsync(DemoUsers.Alice);
+
+        var claim = await ReadAsync<ClaimResponse>(response, HttpStatusCode.Created);
+        Assert.Equal(ClaimStatus.Submitted, claim.Status);
+        Assert.Equal(DemoUsers.Alice, claim.ClaimantId);
     }
 
     [Fact]
-    public async Task R1_Claimant_reports_an_incident_and_can_track_it_R2()
+    public async Task R1_Submit_InvalidReport_ReturnsValidationProblem()
     {
-        var created = await SubmitAsync();
-
-        var tracked = await ReadAsync(await _client.GetAsync($"/api/claims/{created.Id}"));
-
-        Assert.Equal(ClaimStatus.Submitted, tracked.Status);
-        Assert.Equal(DemoUsers.Alice, tracked.ClaimantId);
-        Assert.Single(tracked.StatusHistory);
-
-        var mine = await _client.GetFromJsonAsync<List<ClaimSummaryResponse>>($"/api/claims?claimantId={DemoUsers.Alice}", Json);
-        Assert.Contains(mine!, c => c.Id == created.Id);
-    }
-
-    [Fact]
-    public async Task R1_Invalid_report_returns_validation_problem()
-    {
-        var response = await _client.PostAsJsonAsync(
-            "/api/claims",
-            new SubmitClaimRequest(DemoUsers.Alice, ClaimType.Motor, new DateOnly(2026, 11, 20), "", -5m),
-            Json);
+        var response = await SubmitRequestAsync(DemoUsers.Alice, description: string.Empty, amount: -1m);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<JsonElement>(Json);
@@ -69,18 +110,29 @@ public class ClaimsApiTests(ClaimsApiFactory factory)
     }
 
     [Fact]
-    public async Task R1_An_officer_cannot_report_a_claim()
+    public async Task R1_Submit_OfficerAsClaimant_ReturnsForbidden()
     {
-        var response = await _client.PostAsJsonAsync(
-            "/api/claims",
-            new SubmitClaimRequest(DemoUsers.Carol, ClaimType.Motor, new DateOnly(2026, 11, 20), "Description", 100m),
-            Json);
+        var response = await SubmitRequestAsync(DemoUsers.Carol);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    // --- R2: track a claim ---------------------------------------------------------------------
+
     [Fact]
-    public async Task R2_Unknown_claim_returns_not_found()
+    public async Task R2_Get_SubmittedClaim_ReturnsStatusAndHistory()
+    {
+        var created = await SubmittedAsync();
+
+        var response = await _client.GetAsync($"/api/claims/{created.Id}");
+
+        var claim = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.Submitted, claim.Status);
+        Assert.Single(claim.StatusHistory);
+    }
+
+    [Fact]
+    public async Task R2_Get_UnknownClaim_ReturnsNotFound()
     {
         var response = await _client.GetAsync($"/api/claims/{Guid.NewGuid()}");
 
@@ -88,124 +140,249 @@ public class ClaimsApiTests(ClaimsApiFactory factory)
     }
 
     [Fact]
-    public async Task R5_Officer_sees_unassigned_claims_and_picks_one_up()
+    public async Task R2_List_ByClaimant_ReturnsOnlyThatClaimantsClaims()
     {
-        var created = await SubmitAsync();
+        var alices = await SubmittedAsync(DemoUsers.Alice);
+        var bobs = await SubmittedAsync(DemoUsers.Bob);
 
-        var queue = await _client.GetFromJsonAsync<List<ClaimSummaryResponse>>("/api/claims?unassigned=true&status=Submitted", Json);
-        Assert.Contains(queue!, c => c.Id == created.Id);
+        var claims = await ListAsync($"?claimantId={DemoUsers.Bob}");
 
-        var picked = await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
-
-        Assert.Equal(ClaimStatus.UnderReview, picked.Status);
-        Assert.Equal(DemoUsers.Carol, picked.AssigneeId);
-
-        var after = await _client.GetFromJsonAsync<List<ClaimSummaryResponse>>("/api/claims?unassigned=true", Json);
-        Assert.DoesNotContain(after!, c => c.Id == created.Id);
+        Assert.Contains(claims, c => c.Id == bobs.Id);
+        Assert.DoesNotContain(claims, c => c.Id == alices.Id);
     }
 
     [Fact]
-    public async Task R5_Two_officers_picking_up_the_same_claim_cannot_both_succeed()
+    public async Task R2_List_NoFilter_ReturnsOldestFirst()
     {
-        var created = await SubmitAsync();
+        var first = await SubmittedAsync();
+        var second = await SubmittedAsync();
+
+        var claims = await ListAsync();
+
+        Assert.True(IndexOf(claims, first.Id) < IndexOf(claims, second.Id));
+    }
+
+    // --- R4: receive a decision ----------------------------------------------------------------
+
+    [Fact]
+    public async Task R4_Get_SettledClaim_ShowsTheDecisionToTheClaimant()
+    {
+        var settled = await SettledAsync();
+
+        var response = await _client.GetAsync($"/api/claims/{settled.Id}");
+
+        var claim = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(DecisionOutcome.Settled, claim.DecisionOutcome);
+        Assert.Equal(Reason, claim.DecisionReason);
+        Assert.NotNull(claim.DecidedAt);
+    }
+
+    // --- R5: pick up an incoming claim ---------------------------------------------------------
+
+    [Fact]
+    public async Task R5_PickUp_SubmittedClaim_AssignsTheOfficerAndStartsReview()
+    {
+        var created = await SubmittedAsync();
+
+        var response = await PickUpRequestAsync(created.Id, DemoUsers.Carol);
+
+        var claim = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.UnderReview, claim.Status);
+        Assert.Equal(DemoUsers.Carol, claim.AssigneeId);
+    }
+
+    [Fact]
+    public async Task R5_PickUp_TwoOfficersAtOnce_OnlyOneSucceeds()
+    {
+        var created = await SubmittedAsync();
 
         var responses = await Task.WhenAll(
-            PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)),
-            PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Dave)));
+            PickUpRequestAsync(created.Id, DemoUsers.Carol),
+            PickUpRequestAsync(created.Id, DemoUsers.Dave));
 
         Assert.Single(responses, r => r.StatusCode == HttpStatusCode.OK);
         Assert.Single(responses, r => r.StatusCode == HttpStatusCode.Conflict);
     }
 
     [Fact]
-    public async Task R6_And_R3_Officer_asks_and_claimant_answers()
+    public async Task R5_PickUp_UnknownClaim_ReturnsNotFound()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
+        var response = await PickUpRequestAsync(Guid.NewGuid(), DemoUsers.Carol);
 
-        var asked = await ReadAsync(await PostAsync(
-            created.Id, "information-requests", new RequestInformationRequest(DemoUsers.Carol, "Please send the police report")));
-        Assert.Equal(ClaimStatus.InfoRequested, asked.Status);
-        Assert.Null(Assert.Single(asked.InformationRequests).Response);
-
-        var answered = await ReadAsync(await PostAsync(
-            created.Id, "information-response", new ProvideInformationRequest(DemoUsers.Alice, "Report 4411 attached")));
-
-        Assert.Equal(ClaimStatus.UnderReview, answered.Status);
-        Assert.Equal("Report 4411 attached", Assert.Single(answered.InformationRequests).Response);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public async Task R3_Another_claimant_cannot_answer()
+    public async Task R5_PickUp_ClaimantAsOfficer_ReturnsForbidden()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
-        await ReadAsync(await PostAsync(created.Id, "information-requests", new RequestInformationRequest(DemoUsers.Carol, "Question?")));
+        var created = await SubmittedAsync();
 
-        var response = await PostAsync(created.Id, "information-response", new ProvideInformationRequest(DemoUsers.Bob, "Not my claim"));
+        var response = await PickUpRequestAsync(created.Id, DemoUsers.Alice);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
-    public async Task R7_Assigned_officer_settles_and_claimant_sees_the_decision_R4()
+    public async Task R5_List_Unassigned_ReturnsOnlyClaimsNotYetPickedUp()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
+        var waiting = await SubmittedAsync();
+        var taken = await UnderReviewAsync();
 
-        var settled = await ReadAsync(await PostAsync(created.Id, "settle", new SettleClaimRequest(DemoUsers.Carol, "Covered")));
-        Assert.Equal(ClaimStatus.Settled, settled.Status);
+        var claims = await ListAsync("?unassigned=true");
 
-        var seen = await ReadAsync(await _client.GetAsync($"/api/claims/{created.Id}"));
-        Assert.Equal(DecisionOutcome.Settled, seen.DecisionOutcome);
-        Assert.Equal("Covered", seen.DecisionReason);
-        Assert.NotNull(seen.DecidedAt);
-        Assert.Equal(
-            [ClaimStatus.Submitted, ClaimStatus.UnderReview, ClaimStatus.Settled],
-            seen.StatusHistory.Select(h => h.ToStatus));
+        Assert.Contains(claims, c => c.Id == waiting.Id);
+        Assert.DoesNotContain(claims, c => c.Id == taken.Id);
     }
 
     [Fact]
-    public async Task R7_Rejection_needs_a_reason()
+    public async Task R5_List_ByAssignee_ReturnsOnlyThatOfficersClaims()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
+        var waiting = await SubmittedAsync();
+        var carols = await UnderReviewAsync();
 
-        var response = await PostAsync(created.Id, "reject", new RejectClaimRequest(DemoUsers.Carol, ""));
+        var claims = await ListAsync($"?assigneeId={DemoUsers.Carol}");
+
+        Assert.Contains(claims, c => c.Id == carols.Id);
+        Assert.DoesNotContain(claims, c => c.Id == waiting.Id);
+    }
+
+    [Fact]
+    public async Task R5_List_ByStatus_ReturnsOnlyClaimsInThatStatus()
+    {
+        var waiting = await SubmittedAsync();
+        var underReview = await UnderReviewAsync();
+
+        var claims = await ListAsync("?status=UnderReview");
+
+        Assert.Contains(claims, c => c.Id == underReview.Id);
+        Assert.DoesNotContain(claims, c => c.Id == waiting.Id);
+    }
+
+    // --- R6: review and ask for information ----------------------------------------------------
+
+    [Fact]
+    public async Task R6_RequestInformation_AssignedOfficer_MovesToInfoRequested()
+    {
+        var claim = await UnderReviewAsync();
+
+        var response = await AskRequestAsync(claim.Id, DemoUsers.Carol);
+
+        var asked = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.InfoRequested, asked.Status);
+        Assert.Null(Assert.Single(asked.InformationRequests).Response);
+    }
+
+    [Fact]
+    public async Task R6_RequestInformation_WhileARequestIsOpen_ReturnsConflict()
+    {
+        var claim = await InfoRequestedAsync();
+
+        var response = await AskRequestAsync(claim.Id, DemoUsers.Carol);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    // --- R3: provide additional information ----------------------------------------------------
+
+    [Fact]
+    public async Task R3_ProvideInformation_OpenRequest_StoresTheAnswerAndReturnsToReview()
+    {
+        var claim = await InfoRequestedAsync();
+
+        var response = await AnswerRequestAsync(claim.Id, DemoUsers.Alice);
+
+        var answered = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.UnderReview, answered.Status);
+        Assert.Equal(Answer, Assert.Single(answered.InformationRequests).Response);
+    }
+
+    [Fact]
+    public async Task R3_ProvideInformation_OtherClaimant_ReturnsForbidden()
+    {
+        var claim = await InfoRequestedAsync();
+
+        var response = await AnswerRequestAsync(claim.Id, DemoUsers.Bob);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task R3_ProvideInformation_SecondRound_KeepsBothAnswers()
+    {
+        var claim = await InfoRequestedAsync();
+        await ReadAsync<ClaimResponse>(await AnswerRequestAsync(claim.Id, DemoUsers.Alice));
+        await ReadAsync<ClaimResponse>(await AskRequestAsync(claim.Id, DemoUsers.Carol));
+
+        var response = await AnswerRequestAsync(claim.Id, DemoUsers.Alice);
+
+        var answered = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(2, answered.InformationRequests.Count);
+        Assert.All(answered.InformationRequests, r => Assert.Equal(Answer, r.Response));
+    }
+
+    // --- R7: settle or reject ------------------------------------------------------------------
+
+    [Fact]
+    public async Task R7_Settle_AssignedOfficer_SettlesTheClaim()
+    {
+        var claim = await UnderReviewAsync();
+
+        var response = await SettleRequestAsync(claim.Id, DemoUsers.Carol);
+
+        var settled = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.Settled, settled.Status);
+        Assert.Equal(DecisionOutcome.Settled, settled.DecisionOutcome);
+    }
+
+    [Fact]
+    public async Task R7_Reject_AssignedOfficerWithReason_RejectsTheClaim()
+    {
+        var claim = await UnderReviewAsync();
+
+        var response = await RejectRequestAsync(claim.Id, DemoUsers.Carol);
+
+        var rejected = await ReadAsync<ClaimResponse>(response);
+        Assert.Equal(ClaimStatus.Rejected, rejected.Status);
+        Assert.Equal(Reason, rejected.DecisionReason);
+    }
+
+    [Fact]
+    public async Task R7_Reject_EmptyReason_ReturnsValidationProblem()
+    {
+        var claim = await UnderReviewAsync();
+
+        var response = await RejectRequestAsync(claim.Id, DemoUsers.Carol, reason: string.Empty);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
-    public async Task R7_Rejection_with_a_reason_is_final()
+    public async Task R7_Settle_AlreadyRejectedClaim_ReturnsConflict()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
+        var claim = await UnderReviewAsync();
+        await ReadAsync<ClaimResponse>(await RejectRequestAsync(claim.Id, DemoUsers.Carol));
 
-        var rejected = await ReadAsync(await PostAsync(created.Id, "reject", new RejectClaimRequest(DemoUsers.Carol, "Policy had lapsed")));
-        Assert.Equal(ClaimStatus.Rejected, rejected.Status);
+        var response = await SettleRequestAsync(claim.Id, DemoUsers.Carol);
 
-        var again = await PostAsync(created.Id, "settle", new SettleClaimRequest(DemoUsers.Carol, null));
-        Assert.Equal(HttpStatusCode.Conflict, again.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
     [Fact]
-    public async Task R7_An_officer_who_does_not_own_the_claim_cannot_decide()
+    public async Task R7_Settle_OtherOfficer_ReturnsForbidden()
     {
-        var created = await SubmitAsync();
-        await ReadAsync(await PostAsync(created.Id, "pick-up", new PickUpClaimRequest(DemoUsers.Carol)));
+        var claim = await UnderReviewAsync();
 
-        var response = await PostAsync(created.Id, "settle", new SettleClaimRequest(DemoUsers.Dave, null));
+        var response = await SettleRequestAsync(claim.Id, DemoUsers.Dave);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
-    public async Task R7_Deciding_before_pick_up_returns_conflict()
+    public async Task R7_Settle_ClaimNotPickedUp_ReturnsConflict()
     {
-        var created = await SubmitAsync();
+        var claim = await SubmittedAsync();
 
-        var response = await PostAsync(created.Id, "settle", new SettleClaimRequest(DemoUsers.Carol, null));
+        var response = await SettleRequestAsync(claim.Id, DemoUsers.Carol);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }

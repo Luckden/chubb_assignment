@@ -664,8 +664,11 @@ export interface components {
             statusHistory: components["schemas"]["ClaimStatusChangeResponse"][];
             informationRequests: components["schemas"]["InformationRequestResponse"][];
         };
-        /** @description Lifecycle of a claim. Allowed transitions are documented in docs/design/04-claim-lifecycle.md. */
-        ClaimStatus: number;
+        /**
+         * @description Lifecycle of a claim. Allowed transitions are documented in docs/design/04-claim-lifecycle.md.
+         * @enum {unknown}
+         */
+        ClaimStatus: "Submitted" | "UnderReview" | "InfoRequested" | "Settled" | "Rejected";
         ClaimStatusChangeResponse: {
             fromStatus: null | components["schemas"]["ClaimStatus"];
             toStatus: components["schemas"]["ClaimStatus"];
@@ -691,8 +694,10 @@ export interface components {
             /** Format: date-time */
             submittedAt: string;
         };
-        ClaimType: number;
-        DecisionOutcome: number;
+        /** @enum {unknown} */
+        ClaimType: "Motor" | "Property";
+        /** @enum {unknown} */
+        DecisionOutcome: "Settled" | "Rejected" | null;
         InformationRequestResponse: {
             /** Format: uuid */
             id: string;
