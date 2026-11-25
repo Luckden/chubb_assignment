@@ -18,6 +18,10 @@ public sealed class ClaimStatusChange
         Note = note;
     }
 
+    /// <summary>Rebuilds a recorded change with its original id (sample data import, ADR-0021).</summary>
+    internal ClaimStatusChange(Guid id, Guid claimId, ClaimStatus? from, ClaimStatus to, Guid changedBy, DateTimeOffset changedAt, string? note)
+        : this(claimId, from, to, changedBy, changedAt, note) => Id = id;
+
     public Guid Id { get; private set; }
 
     public Guid ClaimId { get; private set; }

@@ -14,6 +14,9 @@ public sealed class DatabaseOptions
 
     /// <summary>Apply EF Core migrations and run seeders on startup. Development/test only.</summary>
     public bool MigrateOnStartup { get; init; }
+
+    /// <summary>Also load the synthetic claims data set (ADR-0021). Seeding only runs where MigrateOnStartup is on.</summary>
+    public bool SeedSampleData { get; init; }
 }
 
 public static class DatabaseInitializer

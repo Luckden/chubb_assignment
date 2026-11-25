@@ -4,8 +4,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Claims.Api.Application.Claims;
 using Claims.Api.Domain;
+using Claims.Api.Infrastructure.Persistence;
 using Claims.Api.Infrastructure.Persistence.Seeders;
 using Claims.Api.Tests.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Claims.Api.Tests;
 
@@ -232,6 +235,23 @@ public class ClaimsApiTests(ClaimsApiFactory factory)
 
         Assert.Contains(claims, c => c.Id == waiting.Id);
         Assert.DoesNotContain(claims, c => c.Id == taken.Id);
+    }
+
+    [Fact]
+    public async Task R5_List_Unassigned_RejectedClaimWithNoOfficer_IsNotListed()
+    {
+        var claim = await UnderReviewAsync();
+        await ReadAsync<ClaimResponse>(await RejectRequestAsync(claim.Id, DemoUsers.Carol));
+
+        await using var scope = factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ClaimsDbContext>();
+        await db.Claims.Where(c => c.Id == claim.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(c => c.AssigneeId, (Guid?)null));
+
+        var claims = await ListAsync("?unassigned=true");
+
+        Assert.DoesNotContain(claims, c => c.Id == claim.Id);
+        Assert.All(claims, c => Assert.Equal(ClaimStatus.Submitted, c.Status));
     }
 
     [Fact]

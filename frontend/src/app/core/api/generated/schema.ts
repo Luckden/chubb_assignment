@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,
-         *     status, or unassigned claims.
+         *     status, or unassigned claims still waiting to be picked up.
          */
         get: {
             parameters: {

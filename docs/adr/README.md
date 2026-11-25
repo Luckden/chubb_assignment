@@ -36,3 +36,4 @@ Statuses: `Proposed` → `Accepted` → (`Deprecated` | `Superseded by ADR-NNNN`
 | [0018](0018-claimant-notifications-built-by-a-kafka-consumer.md) | Claimant notifications are built by a Kafka consumer | Accepted |
 | [0019](0019-snake-case-database-names.md) | Database tables and columns use snake_case | Accepted |
 | [0020](0020-constraint-traced-tests-use-c-prefix.md) | Tests for infrastructure constraints use a `C{n}_` prefix | Accepted (amended: `D{n}_` for design questions) |
+| [0021](0021-load-synthetic-claims-data-into-the-current-model.md) | Load the synthetic claims data into the current model | Accepted |

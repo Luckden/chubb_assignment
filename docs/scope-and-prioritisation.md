@@ -3,8 +3,8 @@
 This page records what the brief asks for: the objectives, deliverables and constraints, and the design questions it
 poses. The requirements themselves are traced in a design document.
 
-> Status: all seven design questions are answered and all eight requirements are built. Priorities (Must / Should /
-> Won't) in the RTM are still the owner's to set. Don't let the AI decide scope.
+> Status: all seven design questions are answered and all eight requirements are built. Every requirement is Must in
+> the RTM: each one is required by the assignment.
 
 ## Objectives
 

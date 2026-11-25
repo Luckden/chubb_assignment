@@ -20,6 +20,7 @@ var connectionString = builder.Configuration.GetConnectionString("ClaimsDb")
 builder.Services.AddDbContext<ClaimsDbContext>(options => options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 // Seeders run on every startup when Database:MigrateOnStartup is true, so they must be idempotent.
 builder.Services.AddScoped<IDataSeeder, DemoUserSeeder>();
+builder.Services.AddScoped<IDataSeeder, SampleDataSeeder>(); // does nothing unless Database:SeedSampleData is true
 
 // --- Application -----------------------------------------------------------
 // Validators (AbstractValidator<T>) are discovered from this assembly. Call them from application services.

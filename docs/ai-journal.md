@@ -70,7 +70,7 @@ daisyUI skill.
 - **Overrode:** The AI's proposal to make managers a separate actor. The brief's staff requirements already cover insights to 
   team workload.
 - **Still open:** Policy, Decision, InformationRequest, attachments, Team, Market/Currency, the officer view, and the
-  exposure view.
+  exposure view. (deferred by me due to time limitation and scope of assignment)
 
 ### 2026-11-25: Switch to Angular Material
 
@@ -231,12 +231,12 @@ daisyUI skill.
 
 ### 2026-11-25: Outbox clean-up
 
-- **Asked:** "do it" for the one RFC-0002 item left, outbox clean-up.
+- **Asked:** Implement missing implementation for the one RFC-0002 item left, outbox clean-up.
 - **Accepted:** Deleting published rows after 7 days, hourly, from the relay; unpublished rows are never deleted.
   The 7 days is the AI's default.
 - **Challenged:** —
 - **Overrode:** —
-- **Open:** Whether 7 days is the right retention.
+- **Open:** _
 
 ### 2026-11-25: UI for the backend changes, and RFC-0003 built
 
@@ -261,3 +261,47 @@ daisyUI skill.
 - **Challenged:** —
 - **Overrode:** —
 - **Open:** The RTM Priority column (Must / Should / Won't) is still mine to fill in.
+
+### 2026-11-25: Generated Synthetic data for mocking
+
+- **Asked:** Provided the assignment specs file, generate a synthetic dataset to test the system's capability.
+- **Accepted:** One instructions file for my other agent to validatre the system along with and a synthetic dataset in csv.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** _
+
+### 2026-11-25: Synthetic claims data seeding
+
+- **Asked:** Whether the synthetic APAC data set (zip plus README) could be used, then to map it into the current model.
+- **Accepted:** Fitting the data to the four-table model, not extending the model: customers, staff, claims, history
+  and information requests are loaded; policies, reserves, payments, documents and notes are dropped. Ten statuses
+  collapse into five (a withdrawal becomes a rejection), amounts convert to USD, and loading is on in Development
+  only (ADR-0021). The AI chose the status mapping and the USD conversion.
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** `invalid_claim_submissions.csv` as validation fixtures; policies and reserves as a later extension.
+
+### 2026-11-25: Names on seeded claims
+
+- **Asked:** Seeded claims showed "Unknown user", which is misleading once a claim is rejected. Assign a user called
+  SampleClaimant, and sample staff.
+- **Accepted:** —
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** —
+
+### 2026-11-25: Remove the sample claimant
+
+- **Asked:** Remove SampleClaimant and all of that user's claims. Too many claims are seeded for the brief's time limit, and the sample claimant is not in the brief.
+- **Accepted:** —
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** —
+
+### 2026-11-25: Requirement priorities
+
+- **Asked:** All requirements are top priority, since all are requirements for the assignment.
+- **Accepted:** —
+- **Challenged:** —
+- **Overrode:** —
+- **Open:** —

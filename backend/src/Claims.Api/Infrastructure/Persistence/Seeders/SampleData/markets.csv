@@ -1,0 +1,7 @@
+market_code,market_name,currency,fx_rate_to_usd,fx_rate_as_of
+SG,Singapore,SGD,0.75,2026-11-25
+HK,Hong Kong,HKD,0.128,2026-11-25
+MY,Malaysia,MYR,0.22,2026-11-25
+AU,Australia,AUD,0.65,2026-11-25
+TH,Thailand,THB,0.028,2026-11-25
+ID,Indonesia,IDR,6.3e-05,2026-11-25

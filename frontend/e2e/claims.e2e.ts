@@ -49,7 +49,7 @@ async function mockClaimsApi(page: Page, initial: ReturnType<typeof aClaim> | nu
       const status = url.searchParams.get('status');
       const matches =
         claim &&
-        (!unassigned || claim.assigneeId === null) &&
+        (!unassigned || (claim.assigneeId === null && claim.status === 'Submitted')) &&
         (!assigneeId || claim.assigneeId === assigneeId) &&
         (!status || claim.status === status);
       return route.fulfill({ json: matches ? [claim] : [] });

@@ -11,7 +11,15 @@ public static class DemoUsers
     public static readonly Guid Carol = Guid.Parse("00000000-0000-7000-8000-000000000011");
     public static readonly Guid Dave = Guid.Parse("00000000-0000-7000-8000-000000000012");
 
+    /// <summary>Every sample claimant is this user, so a seeded claim has a name (ADR-0021).</summary>
+    public static readonly Guid SampleClaimant = Guid.Parse("00000000-0000-7000-8000-000000000021");
+
+    /// <summary>Every sample officer is this user, including whoever rejected or settled a claim.</summary>
+    public static readonly Guid SampleStaff = Guid.Parse("00000000-0000-7000-8000-000000000022");
+
     public const string Team = "team-a";
+
+    public const string SampleTeam = "sample";
 
     public static IReadOnlyList<User> All { get; } =
     [
@@ -19,6 +27,7 @@ public static class DemoUsers
         new(Bob, "Bob Lim (claimant)", UserRole.Claimant),
         new(Carol, "Carol Wong (officer)", UserRole.Officer, Team),
         new(Dave, "Dave Ng (officer)", UserRole.Officer, Team),
+        new(SampleStaff, "Sample Staff", UserRole.Officer, SampleTeam),
     ];
 }
 

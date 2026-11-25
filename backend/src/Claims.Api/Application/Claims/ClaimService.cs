@@ -71,9 +71,11 @@ public sealed class ClaimService(
             query = query.Where(c => c.Status == s);
         }
 
+        // Unassigned is new work to pick up (RFC-0003): submitted and not yet taken. A rejected claim is already
+        // decided, so it does not come back here just because nobody was assigned.
         if (unassigned == true)
         {
-            query = query.Where(c => c.AssigneeId == null);
+            query = query.Where(c => c.AssigneeId == null && c.Status == ClaimStatus.Submitted);
         }
 
         // The status history is the only record of when the status changed (ADR-0014), so no column is added.

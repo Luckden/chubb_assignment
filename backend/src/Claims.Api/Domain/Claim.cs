@@ -80,6 +80,48 @@ public sealed class Claim
         return claim;
     }
 
+    /// <summary>
+    /// Rebuilds a claim that already has a history (sample data import, ADR-0021). It checks no lifecycle rules and
+    /// raises no events: the facts happened before this system saw them.
+    /// </summary>
+    internal static Claim Restore(
+        Guid id,
+        string claimNumber,
+        Guid claimantId,
+        Guid? assigneeId,
+        ClaimType type,
+        ClaimStatus status,
+        DateOnly incidentDate,
+        string description,
+        decimal claimedAmount,
+        DecisionOutcome? decisionOutcome,
+        string? decisionReason,
+        DateTimeOffset? decidedAt,
+        DateTimeOffset submittedAt,
+        IEnumerable<ClaimStatusChange> statusHistory,
+        IEnumerable<InformationRequest> informationRequests)
+    {
+        var claim = new Claim
+        {
+            Id = id,
+            ClaimNumber = claimNumber,
+            ClaimantId = claimantId,
+            AssigneeId = assigneeId,
+            Type = type,
+            Status = status,
+            IncidentDate = incidentDate,
+            Description = description,
+            ClaimedAmount = claimedAmount,
+            DecisionOutcome = decisionOutcome,
+            DecisionReason = decisionReason,
+            DecidedAt = decidedAt,
+            SubmittedAt = submittedAt,
+        };
+        claim._statusHistory.AddRange(statusHistory);
+        claim._informationRequests.AddRange(informationRequests);
+        return claim;
+    }
+
     /// <summary>R5: staff pick up an incoming claim.</summary>
     public void PickUp(Guid officerId, DateTimeOffset now)
     {

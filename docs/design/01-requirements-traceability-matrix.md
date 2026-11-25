@@ -18,7 +18,7 @@ here.
   `R6_RequestInformation_OtherOfficer_ThrowsNotPermitted`, following the .NET unit testing naming guidance), so any test traces back to a requirement. A test with no requirement ID is out of scope.
 
 **Column key**
-- **Priority:** Must / Should / Won't. Left blank on purpose: scope decisions are mine.
+- **Priority:** Must / Should / Won't. Every requirement is Must: each one is required by the assignment.
 - **Design:** the use case ([doc 2](02-use-cases.md)), entities ([doc 3](03-erd.md)) and lifecycle states ([doc 4](04-claim-lifecycle.md)) that cover the requirement, and later the RFC or ADR that decides how it is met.
 - **Implementation:** the endpoint, event or screen that delivers it. Filled in as code lands.
 - **Test status:** Not run / Pass / Fail. Add who and when in Notes if useful.
@@ -27,14 +27,14 @@ here.
 
 | Req ID | Requirement | Justification | Priority |
 | --- | --- | --- | --- |
-| R1 | Claimant reports an incident | Entry point for every claim; the first step of the lifecycle, and the source of the data R5–R8 work on | |
-| R2 | Claimant tracks their claim | Claimant visibility into status; depends on the lifecycle states defined for R5–R7 | |
-| R3 | Claimant provides additional information when asked | Closes the loop with staff review; depends on a way for staff to ask (R6) | |
-| R4 | Claimant receives decisions | Outcome of R7, delivered back to the claimant | |
-| R5 | Staff pick up incoming claims | Moves a claim from submitted (R1) to being worked | |
-| R6 | Staff review and assess claims | Core staff task; may trigger the information loop in R3 | |
-| R7 | Staff progress claims to settlement or rejection | Ends the lifecycle; produces the decision seen in R4 | |
-| R8 | Staff see their team's workload and performance | Gives staff a view of the work in R5–R7 and how it is going | |
+| R1 | Claimant reports an incident | Entry point for every claim; the first step of the lifecycle, and the source of the data R5–R8 work on | Must |
+| R2 | Claimant tracks their claim | Claimant visibility into status; depends on the lifecycle states defined for R5–R7 | Must |
+| R3 | Claimant provides additional information when asked | Closes the loop with staff review; depends on a way for staff to ask (R6) | Must |
+| R4 | Claimant receives decisions | Outcome of R7, delivered back to the claimant | Must |
+| R5 | Staff pick up incoming claims | Moves a claim from submitted (R1) to being worked | Must |
+| R6 | Staff review and assess claims | Core staff task; may trigger the information loop in R3 | Must |
+| R7 | Staff progress claims to settlement or rejection | Ends the lifecycle; produces the decision seen in R4 | Must |
+| R8 | Staff see their team's workload and performance | Gives staff a view of the work in R5–R7 and how it is going | Must |
 
 ## Traceability
 

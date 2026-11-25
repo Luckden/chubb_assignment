@@ -98,7 +98,7 @@
         "tags": [
           "Claims"
         ],
-        "summary": "List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,\r\nstatus, or unassigned claims.",
+        "summary": "List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,\r\nstatus, or unassigned claims still waiting to be picked up.",
         "parameters": [
           {
             "name": "claimantId",

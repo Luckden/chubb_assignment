@@ -16,6 +16,15 @@ public sealed class InformationRequest
         RequestedAt = requestedAt;
     }
 
+    /// <summary>Rebuilds a recorded request, answered or not, with its original id (sample data import, ADR-0021).</summary>
+    internal InformationRequest(Guid id, Guid claimId, Guid requestedBy, string question, DateTimeOffset requestedAt, string? response, DateTimeOffset? respondedAt)
+        : this(claimId, requestedBy, question, requestedAt)
+    {
+        Id = id;
+        Response = response;
+        RespondedAt = respondedAt;
+    }
+
     public Guid Id { get; private set; }
 
     public Guid ClaimId { get; private set; }

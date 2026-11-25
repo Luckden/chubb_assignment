@@ -22,7 +22,7 @@ public class ClaimsController(ClaimService claims) : ControllerBase
 
     /// <summary>
     /// List claims, oldest first by submission (default) or by time in current status. Filter by claimant, assignee,
-    /// status, or unassigned claims.
+    /// status, or unassigned claims still waiting to be picked up.
     /// </summary>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<ClaimSummaryResponse>>(StatusCodes.Status200OK)]
